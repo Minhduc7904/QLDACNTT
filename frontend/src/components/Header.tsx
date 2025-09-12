@@ -80,7 +80,7 @@ const Header: React.FC = () => {
                                     {user?.avatar ? (
                                         <img
                                             src={user.avatar}
-                                            alt={user.name || 'User'}
+                                            alt={user.fullName || 'User'}
                                             className="w-8 h-8 rounded-full object-cover"
                                         />
                                     ) : (
@@ -91,7 +91,7 @@ const Header: React.FC = () => {
                                 {/* User Info */}
                                 <div className="hidden sm:block text-left">
                                     <p className="text-sm font-medium text-gray-900">
-                                        {user?.name || 'User'}
+                                        {user?.fullName || 'User'}
                                     </p>
                                     <p className="text-xs text-gray-500">
                                         {user?.email}
@@ -106,7 +106,7 @@ const Header: React.FC = () => {
                                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                                     <div className="px-4 py-2 border-b border-gray-100">
                                         <p className="text-sm font-medium text-gray-900">
-                                            {user?.name || 'User'}
+                                            {user?.fullName || 'User'}
                                         </p>
                                         <p className="text-xs text-gray-500">{user?.email}</p>
                                         <p className="text-xs text-yellow-600 font-medium mt-1">

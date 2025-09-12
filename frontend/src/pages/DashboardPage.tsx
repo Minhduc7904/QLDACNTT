@@ -35,7 +35,7 @@ const DashboardPage: React.FC = () => {
                             {t('overview')}
                         </h1>
                         <p className="mt-2 text-gray-600">
-                            {t('welcomeBack')}, {user?.name || 'User'}!
+                            {t('welcomeBack')}, {user?.fullName || 'User'}!
                         </p>
                     </div>
                 </div>

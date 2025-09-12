@@ -15,6 +15,7 @@ const LoginPage: React.FC = () => {
     const dispatch = useDispatch();
     const { login, isLoading, error } = useAuth();
     const { t } = useTranslation();
+    const { user, refreshToken, accessToken } = useAuth();
 
     const [formData, setFormData] = useState({
         identifier: '', // Có thể là email hoặc username
@@ -60,6 +61,12 @@ const LoginPage: React.FC = () => {
         // Load remembered credentials
         loadRememberedCredentials();
     }, []); // Empty dependency array to run only once
+
+    useEffect(() => {
+        if (user && accessToken && refreshToken) {
+            navigate('/dashboard');
+        }
+    }, [user, accessToken, refreshToken]);
 
     // Load remembered credentials from localStorage
     const loadRememberedCredentials = () => {

@@ -1,27 +1,10 @@
-import { apiService } from './apiService';
-import { API_ENDPOINTS } from '../constants';
-import { User, LoginRequest, RegisterRequest, ApiResponse } from '../types';
+import { authStudentService } from './authStudentService';
+import { authAdminService } from './authAdminService';
 
-export class AuthService {
-    async login(credentials: LoginRequest): Promise<ApiResponse<{ user: User; token: string }>> {
-        return apiService.post(API_ENDPOINTS.AUTH.LOGIN, credentials);
-    }
+// Re-export specialized auth services
+export { authStudentService } from './authStudentService';
+export { authAdminService } from './authAdminService';
 
-    async register(userData: RegisterRequest): Promise<ApiResponse<{ user: User; token: string }>> {
-        return apiService.post(API_ENDPOINTS.AUTH.REGISTER, userData);
-    }
-
-    async logout(): Promise<ApiResponse> {
-        return apiService.post(API_ENDPOINTS.AUTH.LOGOUT);
-    }
-
-    async refreshToken(): Promise<ApiResponse<{ token: string }>> {
-        return apiService.post(API_ENDPOINTS.AUTH.REFRESH);
-    }
-
-    async getProfile(): Promise<ApiResponse<User>> {
-        return apiService.get(API_ENDPOINTS.AUTH.PROFILE);
-    }
-}
-
-export const authService = new AuthService();
+// Legacy export for backward compatibility
+// You should use authStudentService or authAdminService instead
+export const authService = authStudentService;

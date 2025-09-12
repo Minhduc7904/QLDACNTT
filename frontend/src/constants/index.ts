@@ -1,10 +1,24 @@
 export const API_ENDPOINTS = {
     AUTH: {
-        LOGIN: '/auth/student/login',
-        REGISTER: '/auth/student/register',
-        LOGOUT: '/auth/student/logout',
-        REFRESH: '/auth/student/refresh',
-        PROFILE: '/auth/student/profile',
+        STUDENT: {
+            LOGIN: '/auth/student/login',
+            REGISTER: '/auth/student/register',
+            LOGOUT: '/auth/logout',
+            REFRESH: '/auth/refresh',
+            PROFILE: '/auth/student/profile',
+        },
+        ADMIN: {
+            LOGIN: '/auth/admin/login',
+            REGISTER: '/auth/admin/register',
+            LOGOUT: '/auth/logout',
+            REFRESH: '/auth/refresh',
+            PROFILE: '/auth/admin/profile',
+        },
+        COMMON: {
+            LOGOUT: '/auth/logout',
+            LOGOUT_ALL_DEVICES: '/auth/logout/all-devices',
+            REFRESH: '/auth/refresh',
+        }
     },
     USERS: {
         LIST: '/users',
@@ -26,9 +40,22 @@ export const APP_ROUTES = {
 } as const;
 
 export const STORAGE_KEYS = {
+    // Legacy keys (for backward compatibility)
     ACCESS_TOKEN: 'access_token',
     REFRESH_TOKEN: 'refresh_token',
     USER_DATA: 'user_data',
+    
+    // Student specific keys
+    STUDENT_ACCESS_TOKEN: 'student_access_token',
+    STUDENT_REFRESH_TOKEN: 'student_refresh_token',
+    STUDENT_USER_DATA: 'student_user_data',
+    
+    // Admin specific keys
+    ADMIN_ACCESS_TOKEN: 'admin_access_token',
+    ADMIN_REFRESH_TOKEN: 'admin_refresh_token',
+    ADMIN_USER_DATA: 'admin_user_data',
+    
+    // General keys
     THEME: 'theme',
     LANGUAGE: 'language',
     REMEMBER_EMAIL: 'rememberedEmail',
