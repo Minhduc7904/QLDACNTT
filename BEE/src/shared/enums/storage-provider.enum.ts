@@ -19,21 +19,19 @@ export const StorageProviderLabels: Record<StorageProvider, string> = {
   [StorageProvider.S3]: 'Amazon S3',
   [StorageProvider.GCS]: 'Google Cloud Storage',
   [StorageProvider.EXTERNAL]: 'External URL',
-};
+}
 
 /**
  * Storage Provider Options cho dropdown/select
  */
-export const StorageProviderOptions = Object.entries(StorageProviderLabels).map(
-  ([value, label]) => ({
-    value: value as StorageProvider,
-    label,
-  })
-);
+export const StorageProviderOptions = Object.entries(StorageProviderLabels).map(([value, label]) => ({
+  value: value as StorageProvider,
+  label,
+}))
 
 /**
  * Validate storage provider
  */
 export const isValidStorageProvider = (value: string): value is StorageProvider => {
-  return Object.values(StorageProvider).includes(value as StorageProvider);
-};
+  return Object.values(StorageProvider).includes(value as StorageProvider)
+}
