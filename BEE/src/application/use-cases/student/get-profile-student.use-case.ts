@@ -23,6 +23,21 @@ export class GetProfileStudentUseCase {
             student.user.avatar = avatar ?? undefined;
         };
 
+        return BaseResponseDto.success(
+            'Get profile student successfully',
+            StudentResponseDto.fromStudentEntity(student)
+        );
+    }
+
+    async executeByUserId(userId: number): Promise<BaseResponseDto<StudentResponseDto>> {
+        const student = await this.studentRepository.findByUserId(userId);
+        if (!student) {
+            throw new NotFoundException('Student not found');
+        }
+        if (student.user && student.user.avatarId) {
+            const avatar = await this.imageRepository.findById(student.user.avatarId);
+            student.user.avatar = avatar ?? undefined;
+        };
 
         return BaseResponseDto.success(
             'Get profile student successfully',

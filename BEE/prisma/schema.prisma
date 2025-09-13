@@ -193,6 +193,7 @@ enum StorageProvider {
   LOCAL
   S3
   GCS
+  SUPABASE
   EXTERNAL
 }
 

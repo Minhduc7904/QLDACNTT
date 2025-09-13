@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
-import { getStudentProfile, updateStudentProfile, clearStudentProfileError, setStudentProfile, clearStudentProfile } from '../store/slices/studentSlice';
+import { getStudentProfile, updateStudentProfile, clearStudentProfileError, setStudentProfile, clearStudentProfile, updateAvatar } from '../store/slices/studentSlice';
 import { Student } from '../types';
 
 export const useStudent = () => {
@@ -27,6 +27,10 @@ export const useStudent = () => {
         return dispatch(updateStudentProfile({ id, data }));
     };
 
+    const updateProfileAvatar = (payload: string) => {
+        return dispatch(updateAvatar(payload));
+    };
+
     return {
         profile,
         isLoading,
@@ -37,5 +41,6 @@ export const useStudent = () => {
         clearError,
         setProfile,
         clearProfile,
+        updateProfileAvatar,
     };
 };

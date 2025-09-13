@@ -10,7 +10,7 @@ export class PrismaService extends PrismaClient {
           url: process.env.DATABASE_URL,
         },
       },
-      log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+      log: ['error', 'warn'], // Chỉ log errors và warnings
       errorFormat: 'pretty',
     })
 

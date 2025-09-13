@@ -153,7 +153,7 @@ export interface Image {
   url: string;
   anotherUrl?: string;
   mimeType?: string;
-  storageProvider?: 'LOCAL' | 'S3' | 'GCS' | 'EXTERNAL';
+  storageProvider?: 'LOCAL' | 'S3' | 'GCS' | 'EXTERNAL' | 'SUPABASE';
   createdAt?: string;
   updatedAt?: string;
 }

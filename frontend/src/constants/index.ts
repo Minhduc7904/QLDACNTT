@@ -25,6 +25,7 @@ export const API_ENDPOINTS = {
     },
     STUDENT: {
         PROFILE: (id: string) => `/students/profile/${id}`,
+        PROFILE_ME: '/students/profile/me',
         UPDATE: (id: string) => `/students/update/${id}`,
     },
     USERS: {
@@ -33,6 +34,7 @@ export const API_ENDPOINTS = {
         CREATE: '/users',
         UPDATE: (id: string) => `/users/${id}`,
         DELETE: (id: string) => `/users/${id}`,
+        AVATAR: '/users/avatar',
     },
 } as const;
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Input, Card, FormDropdown, LoadingSpinner, Avatar } from '../components';
 import { useStudent, useStudentAuth, useTranslation, useNotification } from '../hooks';
-import { authStudentService } from '../services';
+import { authStudentService, studentService } from '../services';
 import { validateRequired, isValidEmail } from '../utils';
 import { User, Mail, Phone, School, GraduationCap, Shield, Camera, Edit3, Save, X, MailCheck } from 'lucide-react';
 import StudentPageLayout from '../layout/StudentPageLayout';
@@ -19,11 +19,11 @@ interface ProfileFormData {
 
 const StudentProfilePage: React.FC = () => {
     const navigate = useNavigate();
-    const { profile, isLoading, isUpdating, fetchProfile, updateProfile } = useStudent();
-    const { user: authUser } = useStudentAuth();
+    const { profile, isLoading, isUpdating, fetchProfile, updateProfile, updateProfileAvatar } = useStudent();
+    const { user: authUser, updateAvatarStudent } = useStudentAuth();
     const { t } = useTranslation();
     const { showSuccess, showError } = useNotification();
-
+    const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState<ProfileFormData>({
         firstName: '',
@@ -181,6 +181,52 @@ const StudentProfilePage: React.FC = () => {
         setIsEditing(false);
     };
 
+    // Handle avatar file selection and auto upload
+    const handleAvatarFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                showError('Chỉ chấp nhận file ảnh (JPG, PNG, GIF, WEBP)', t('error'));
+                return;
+            }
+
+            // Validate file size (5MB max)
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                showError('Kích thước file không được vượt quá 5MB', t('error'));
+                return;
+            }
+
+            // Auto upload the file immediately after selection
+            try {
+                setIsUpdatingAvatar(true);
+                const response = await studentService.updateAvatar(file);
+
+
+                if (response.success) {
+                    showSuccess(t('avatarUpdated'), t('success'));
+                    updateProfileAvatar(response.data.avatarUrl);
+                    updateAvatarStudent(response.data.avatarUrl);
+                } else {
+                    showError(response.message || t('avatarUpdateFailed'), t('error'));
+                }
+            } catch (error) {
+                console.error('Error uploading avatar:', error);
+            }
+            setIsUpdatingAvatar(false);
+        }
+        // Reset input value to allow selecting the same file again
+        event.target.value = '';
+    };
+
+    // Handle avatar upload button click
+    const handleAvatarButtonClick = () => {
+        const fileInput = document.getElementById('avatar-file-input') as HTMLInputElement;
+        fileInput?.click();
+    };
+
     if (isLoading) {
         return (
             <StudentPageLayout>
@@ -234,9 +280,27 @@ const StudentProfilePage: React.FC = () => {
                                     size="xl"
                                     className="mx-auto mb-4 shadow-lg"
                                 />
-                                <button className="absolute bottom-0 right-0 w-10 h-10 bg-yellow-500 hover:bg-yellow-600 rounded-full flex items-center justify-center text-white shadow-lg transition-colors">
-                                    <Camera className="h-5 w-5" />
+                                <button
+                                    onClick={handleAvatarButtonClick}
+                                    disabled={isUpdatingAvatar}
+                                    className="absolute bottom-0 right-0 w-10 h-10 bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-full flex items-center justify-center text-white shadow-lg transition-colors"
+                                    title={isUpdatingAvatar ? 'Đang cập nhật avatar...' : 'Thay đổi avatar'}
+                                >
+                                    {isUpdatingAvatar ? (
+                                        <LoadingSpinner size="sm" />
+                                    ) : (
+                                        <Camera className="h-5 w-5" />
+                                    )}
                                 </button>
+
+                                {/* Hidden file input */}
+                                <input
+                                    id="avatar-file-input"
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                    onChange={handleAvatarFileSelect}
+                                    className="hidden"
+                                />
                             </div>
                             <h3 className="text-xl font-semibold text-gray-900">{profile.fullName}</h3>
                             <p className="text-sm text-gray-500 mt-1">@{profile.username}</p>

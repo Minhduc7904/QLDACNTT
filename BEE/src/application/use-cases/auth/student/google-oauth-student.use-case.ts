@@ -28,7 +28,7 @@ export class GoogleOAuthStudentUseCase {
   async execute(googleProfile: GoogleUserProfileDto): Promise<BaseResponseDto<LoginResponseDto>> {
     return await this.unitOfWork.executeInTransaction(async (repos) => {
       // 1. Kiểm tra user đã tồn tại chưa
-      console.log(googleProfile);
+      // console.log(googleProfile);
       let existingUser = await repos.userRepository.findByEmail(googleProfile.email)
 
       let user, student, studentId: number
@@ -67,7 +67,7 @@ export class GoogleOAuthStudentUseCase {
         const hashedPassword = await this.passwordService.hashPassword(randomPassword)
 
         let avatarId: number | undefined = undefined
-        console.log(googleProfile.picture);
+        // console.log(googleProfile.picture);
         if (googleProfile.picture) {
           const avatar = await repos.imageRepository.create({
             url: googleProfile.picture,
@@ -155,7 +155,6 @@ export class GoogleOAuthStudentUseCase {
         ipAddress: undefined,
         deviceFingerprint: undefined,
       })
-      console.log('Login successful', StudentResponseDto.fromUserWithStudent(user, student));
       return {
         success: true,
         message: 'Đăng nhập Google Student thành công',

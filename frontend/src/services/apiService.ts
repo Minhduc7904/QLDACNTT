@@ -87,6 +87,11 @@ class ApiService {
           config.headers.Authorization = `Bearer ${token}`;
         }
 
+        // Handle FormData - remove Content-Type to let browser set it
+        if (config.data instanceof FormData) {
+          delete config.headers['Content-Type'];
+        }
+
         // Log API request in development
         this.logRequest(config);
 

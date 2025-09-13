@@ -110,11 +110,9 @@ export class GoogleAuthStudentController {
         return res.redirect(redirectUrl)
       }
 
-      // Redirect to frontend auth callback with authentication data
-      // Encode user data dùng Base64 để tránh lỗi URL encoding
-      const userDataBase64 = Buffer.from(JSON.stringify(result.data.user)).toString('base64')
-
-      const redirectUrl = `${frontendUrl}/auth/callback?token=${result.data.tokens.accessToken}&refresh=${result.data.tokens.refreshToken}&userData=${userDataBase64}`
+      // Redirect to frontend auth callback with authentication tokens only
+      // Frontend sẽ gọi API profile để lấy user data sau khi có tokens
+      const redirectUrl = `${frontendUrl}/auth/callback?token=${result.data.tokens.accessToken}&refresh=${result.data.tokens.refreshToken}`
       return res.redirect(redirectUrl)
     } catch (error) {
       console.error('Google OAuth callback error:', error)

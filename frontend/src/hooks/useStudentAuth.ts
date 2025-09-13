@@ -8,7 +8,8 @@ import {
     initializeStudentAuth,
     setStudentAccessToken,
     setStudentRefreshToken,
-    setStudentUser
+    setStudentUser,
+    updateUserAvatar
 } from '../store/slices/studentAuthSlice';
 import { LoginRequest, RegisterStudentRequest } from '../types';
 
@@ -54,6 +55,10 @@ export const useStudentAuth = () => {
         dispatch(setStudentUser(user));
     };
 
+    const updateAvatarStudent = (avatar: string) => {
+        dispatch(updateUserAvatar(avatar));
+    };
+
     return {
         // State
         user,
@@ -72,6 +77,7 @@ export const useStudentAuth = () => {
         clearAuthError,
         setAccessToken,
         setRefreshToken,
-        setStudent
+        setStudent,
+        updateAvatarStudent
     };
 };

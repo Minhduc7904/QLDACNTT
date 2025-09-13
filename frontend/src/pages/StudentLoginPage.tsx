@@ -64,7 +64,7 @@ const StudentLoginPage: React.FC = () => {
 
     useEffect(() => {
         if (user && accessToken && refreshToken) {
-            navigate('/dashboard');
+            navigate('/student/dashboard');
         }
     }, [user, accessToken, refreshToken]);
 
@@ -130,7 +130,7 @@ const StudentLoginPage: React.FC = () => {
 
         const result = await login(loginData);
         if (result.meta.requestStatus === 'fulfilled') {
-            navigate('/dashboard');
+            navigate('/student/dashboard');
         }
     };
 

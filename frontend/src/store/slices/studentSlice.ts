@@ -72,6 +72,9 @@ const studentSlice = createSlice({
             state.profile = null;
             state.error = null;
         },
+        updateAvatar: (state, action: PayloadAction<string>) => {
+            state.profile?.imageUrls && (state.profile.imageUrls.url = action.payload);
+        }
     },
     extraReducers: (builder) => {
         // Get Profile
@@ -106,5 +109,5 @@ const studentSlice = createSlice({
     },
 });
 
-export const { clearStudentProfileError, setStudentProfile, clearStudentProfile } = studentSlice.actions;
+export const { clearStudentProfileError, setStudentProfile, clearStudentProfile, updateAvatar } = studentSlice.actions;
 export default studentSlice.reducer;

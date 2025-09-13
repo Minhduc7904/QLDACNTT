@@ -1,5 +1,7 @@
 // src/presentation/controllers/student.controller.ts
-import { Controller, Get, Query, HttpCode, HttpStatus, Param, Body, Put } from '@nestjs/common'
+import { Controller, Get, Query, HttpCode, HttpStatus, Param, Body, Put, Req } from '@nestjs/common'
+import { Request } from 'express'
+import { UnauthorizedException } from 'src/shared/exceptions/custom-exceptions'
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger'
 import { StudentListQueryDto } from 'src/application/dtos/student/student-list-query.dto'
 import { StudentListResponseDto, StudentResponseDto, UpdateStudentDto } from 'src/application/dtos/student/student.dto'
@@ -58,6 +60,28 @@ export class StudentController {
   })
   async fetchStudentFromApi(@Query('limit') limit?: number): Promise<{ processed: number; errors: number }> {
     return ExceptionHandler.execute(() => this.fetchStudentFromApiUseCase.execute(limit))
+  }
+
+  @Get('profile/me')
+  @HttpCode(HttpStatus.OK)
+  @StudentOnly()
+  @ApiOperation({ summary: 'Lấy thông tin profile của current user' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Lấy thông tin profile thành công',
+    type: StudentListResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Chưa đăng nhập',
+    type: ErrorResponseDto,
+  })
+  async getCurrentStudentProfile(@Req() req: Request & { user?: any }): Promise<BaseResponseDto<StudentResponseDto>> {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException('User ID not found in token');
+    }
+    return ExceptionHandler.execute(() => this.getProfileStudentUseCase.executeByUserId(userId))
   }
 
   @Get('profile/:studentId')

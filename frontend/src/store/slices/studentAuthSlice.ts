@@ -175,6 +175,11 @@ const studentAuthSlice = createSlice({
         setStudentRefreshToken: (state, action: PayloadAction<string>) => {
             state.refreshToken = action.payload;
         },
+        updateUserAvatar: (state, action: PayloadAction<string>) => {
+            if (state.user && state.user.imageUrls) {
+                state.user.imageUrls.url = action.payload;
+            }
+        }
     },
     extraReducers: (builder) => {
         // Login
@@ -277,5 +282,5 @@ const studentAuthSlice = createSlice({
     },
 });
 
-export const { clearStudentError, setStudentUser, clearStudentAuth, initializeStudentAuth, setStudentAccessToken, setStudentRefreshToken } = studentAuthSlice.actions;
+export const { clearStudentError, setStudentUser, clearStudentAuth, initializeStudentAuth, setStudentAccessToken, setStudentRefreshToken, updateUserAvatar } = studentAuthSlice.actions;
 export default studentAuthSlice.reducer;

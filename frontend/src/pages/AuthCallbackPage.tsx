@@ -15,12 +15,11 @@ const AuthCallbackPage: React.FC = () => {
     useEffect(() => {
         if (isProcessed) return; // Tránh xử lý nhiều lần
 
-        const handleAuthCallback = () => {
+        const handleAuthCallback = async () => {
             setIsProcessed(true);
 
             const token = searchParams.get('token');
             const refreshToken = searchParams.get('refresh');
-            const userDataBase64 = searchParams.get('userData');
             const error = searchParams.get('error');
 
             // Nếu có lỗi từ backend
@@ -44,35 +43,41 @@ const AuthCallbackPage: React.FC = () => {
             }
 
             // Nếu có thông tin auth
-            if (token && refreshToken && userDataBase64) {
+            if (token && refreshToken) {
                 try {
-                    // Decode Base64 user data
-                    const decodedUserData = atob(userDataBase64);
-
-                    // Parse JSON
-                    const user = JSON.parse(decodedUserData);
-                    // Lưu vào localStorage
+                    // Lưu tokens vào localStorage trước
                     localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
                     localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-                    localStorage.setItem(STORAGE_KEYS.STUDENT_USER_DATA, JSON.stringify(user));
 
-                    // Cập nhật Redux state
-                    setStudent(user)
+                    // Gọi API để lấy thông tin user profile
+                    const { studentService } = await import('../services');
+                    const profileResponse = await studentService.getCurrentProfile();
 
-                    // Hiển thị thông báo thành công
-                    showSuccess('Đăng nhập Google thành công!', 'Chào mừng');
+                    if (profileResponse.success && profileResponse.data) {
+                        const user = profileResponse.data;
 
-                    // Chuyển hướng đến student dashboard
-                    navigate('/student/dashboard', { replace: true });
-                } catch (parseError) {
-                    console.error('Error parsing Google auth callback:', parseError);
-                    console.error('Raw userDataBase64:', userDataBase64);
-                    try {
-                        console.error('Decoded userData:', atob(userDataBase64));
-                    } catch (decodeError) {
-                        console.error('Failed to decode Base64:', decodeError);
+                        // Lưu user data vào localStorage
+                        localStorage.setItem(STORAGE_KEYS.STUDENT_USER_DATA, JSON.stringify(user));
+
+                        // Cập nhật Redux state
+                        setStudent(user);
+
+                        // Hiển thị thông báo thành công
+                        showSuccess('Đăng nhập Google thành công!', 'Chào mừng');
+
+                        // Chuyển hướng đến student dashboard
+                        navigate('/student/dashboard', { replace: true });
+                    } else {
+                        throw new Error('Failed to get user profile');
                     }
-                    showError('Lỗi xử lý đăng nhập Google: ' + (parseError as Error).message);
+                } catch (profileError) {
+                    console.error('Error fetching user profile:', profileError);
+                    showError('Lỗi lấy thông tin người dùng: ' + (profileError as Error).message);
+                    
+                    // Clear tokens nếu lỗi
+                    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+                    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+                    
                     navigate('/student/login', { replace: true });
                 }
             } else {

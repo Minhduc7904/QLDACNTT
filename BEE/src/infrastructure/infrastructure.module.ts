@@ -17,12 +17,14 @@ import { EmailVerificationTokenService } from './services/email-verification-tok
 import { HttpClientService } from './services/http-client.service'
 import { AuthService } from './services/auth.service'
 import { ResendEmailService } from './services/resend-email.service'
+import { SupabaseStorageService } from './services/supabase-storage.service'
 import { GoogleAdminStrategy } from './strategies/google-admin.strategy'
 import { GoogleStudentStrategy } from './strategies/google-student.strategy'
 import jwtConfig from '../config/jwt.config'
 import googleOAuthConfig from '../config/google-oauth.config'
 import emailConfig from '../config/email.config'
 import httpClientConfig from '../config/http-client.config'
+import supabaseConfig from '../config/supabase.config'
 
 @Module({
   imports: [
@@ -31,6 +33,7 @@ import httpClientConfig from '../config/http-client.config'
     ConfigModule.forFeature(googleOAuthConfig),
     ConfigModule.forFeature(emailConfig),
     ConfigModule.forFeature(httpClientConfig),
+    ConfigModule.forFeature(supabaseConfig),
     JwtModule.register({}), // Empty config, sẽ override trong service
   ],
   providers: [
@@ -88,6 +91,10 @@ import httpClientConfig from '../config/http-client.config'
       provide: 'IEmailService',
       useClass: ResendEmailService,
     },
+    {
+      provide: 'IStorageService',
+      useClass: SupabaseStorageService,
+    },
     GoogleAdminStrategy,
     GoogleStudentStrategy,
   ],
@@ -105,6 +112,7 @@ import httpClientConfig from '../config/http-client.config'
     'HTTP_CLIENT_SERVICE',
     'AUTH_SERVICE',
     'IEmailService',
+    'IStorageService',
   ],
 })
 export class InfrastructureModule { }

@@ -8,6 +8,7 @@ export enum StorageProvider {
   LOCAL = 'LOCAL',
   S3 = 'S3',
   GCS = 'GCS',
+  SUPABASE = 'SUPABASE',
   EXTERNAL = 'EXTERNAL',
 }
 
@@ -18,6 +19,7 @@ export const StorageProviderLabels: Record<StorageProvider, string> = {
   [StorageProvider.LOCAL]: 'Local Storage',
   [StorageProvider.S3]: 'Amazon S3',
   [StorageProvider.GCS]: 'Google Cloud Storage',
+  [StorageProvider.SUPABASE]: 'Supabase Storage',
   [StorageProvider.EXTERNAL]: 'External URL',
 }
 
