@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useAuth, useTranslation } from '../hooks';
+import { useStudentAuth, useTranslation } from '../hooks';
 import { Card, LoadingSpinner, Header } from '../components';
 import { BeeLogoBrand } from '../components/common';
 import { initializeLanguage } from '../store/slices/languageSlice';
+import StudentPageLayout from '../layout/StudentPageLayout';
 
 const DashboardPage: React.FC = () => {
     const dispatch = useDispatch();
-    const { user, isLoading } = useAuth();
+    const { user, isLoading } = useStudentAuth();
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -24,9 +25,7 @@ const DashboardPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Header />
-            
+        <StudentPageLayout>
             <div className="py-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-8">
@@ -119,7 +118,7 @@ const DashboardPage: React.FC = () => {
                     </div>
                 </main>
             </div>
-        </div>
+        </StudentPageLayout>
     );
 };
 

@@ -5,7 +5,6 @@ export const API_ENDPOINTS = {
             REGISTER: '/auth/student/register',
             LOGOUT: '/auth/logout',
             REFRESH: '/auth/refresh',
-            PROFILE: '/auth/student/profile',
         },
         ADMIN: {
             LOGIN: '/auth/admin/login',
@@ -18,7 +17,15 @@ export const API_ENDPOINTS = {
             LOGOUT: '/auth/logout',
             LOGOUT_ALL_DEVICES: '/auth/logout/all-devices',
             REFRESH: '/auth/refresh',
+        },
+        EMAIL_VERIFICATION: {
+            SEND: '/auth/send-verification-email',
+            VERIFY: '/auth/verify-email',
         }
+    },
+    STUDENT: {
+        PROFILE: (id: string) => `/students/profile/${id}`,
+        UPDATE: (id: string) => `/students/update/${id}`,
     },
     USERS: {
         LIST: '/users',
@@ -31,9 +38,13 @@ export const API_ENDPOINTS = {
 
 export const APP_ROUTES = {
     HOME: '/',
-    LOGIN: '/login',
-    REGISTER: '/register',
+    LOGIN: '/login', // Legacy - redirects to student login
+    STUDENT_LOGIN: '/student/login',
+    ADMIN_LOGIN: '/admin/login',
+    REGISTER: '/register', // Legacy - redirects to student register
+    STUDENT_REGISTER: '/student/register',
     DASHBOARD: '/dashboard',
+    ADMIN_DASHBOARD: '/admin/dashboard',
     PROFILE: '/profile',
     USERS: '/users',
     NOT_FOUND: '/404',
@@ -43,24 +54,24 @@ export const STORAGE_KEYS = {
     // Legacy keys (for backward compatibility)
     ACCESS_TOKEN: 'access_token',
     REFRESH_TOKEN: 'refresh_token',
-    USER_DATA: 'user_data',
-    
-    // Student specific keys
-    STUDENT_ACCESS_TOKEN: 'student_access_token',
-    STUDENT_REFRESH_TOKEN: 'student_refresh_token',
+
     STUDENT_USER_DATA: 'student_user_data',
-    
-    // Admin specific keys
-    ADMIN_ACCESS_TOKEN: 'admin_access_token',
-    ADMIN_REFRESH_TOKEN: 'admin_refresh_token',
+
     ADMIN_USER_DATA: 'admin_user_data',
-    
+
     // General keys
     THEME: 'theme',
     LANGUAGE: 'language',
+
+    // Student remember me keys
     REMEMBER_EMAIL: 'rememberedEmail',
     REMEMBER_USERNAME: 'rememberedUsername',
     REMEMBER_LOGIN_TYPE: 'rememberedLoginType',
+
+    // Admin remember me keys
+    ADMIN_REMEMBER_EMAIL: 'adminRememberedEmail',
+    ADMIN_REMEMBER_USERNAME: 'adminRememberedUsername',
+    ADMIN_REMEMBER_LOGIN_TYPE: 'adminRememberedLoginType',
 } as const;
 
 export const HTTP_STATUS = {

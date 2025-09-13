@@ -2,20 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Button, Input, Card, LanguageToggle, Checkbox } from '../components';
-import { useAuth, useTranslation } from '../hooks';
+import { BeeLogoBrand } from '../components/common';
+import { useStudentAuth, useTranslation } from '../hooks';
 import { validateRequired, isValidEmail } from '../utils';
 import { STORAGE_KEYS } from '../constants';
-import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User, GraduationCap } from 'lucide-react';
 import { initializeLanguage } from '../store/slices/languageSlice';
 
-const LoginPage: React.FC = () => {
+const StudentLoginPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [loginType, setLoginType] = useState<'email' | 'username'>('email');
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { login, isLoading, error } = useAuth();
+    const { login, isLoading, error, user, refreshToken, accessToken } = useStudentAuth();
     const { t } = useTranslation();
-    const { user, refreshToken, accessToken } = useAuth();
 
     const [formData, setFormData] = useState({
         identifier: '', // Có thể là email hoặc username
@@ -163,24 +163,34 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-yellow-50 via-white to-orange-50">
             <LanguageToggle />
 
-            <div className="max-w-md w-full space-y-8">
-                <Card shadow='none' className="max-w-md space-y-8 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border">
-                    <div>
-                        <h2 className="text-center text-3xl font-extrabold text-gray-900">
-                            {t('title')}
-                        </h2>
-                        <p className="mt-2 text-center text-sm text-gray-600">
+            <div className="max-w-md w-full space-y-4">
+                <Card shadow='none' className="max-w-md space-y-4 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border shadow-lg">
+                    <div className="text-center">
+                        {/* Student Icon & Branding */}
+                        <div className="flex justify-center mb-4">
+                            <BeeLogoBrand size="lg" iconVariant="hexagon" />
+                        </div>
+
+                        <div className="flex items-center justify-center space-x-2 mb-4">
+                            <GraduationCap className="h-6 w-6 text-yellow-600" />
+                            <h2 className="text-2xl font-bold text-gray-900">
+                                {t('title')}
+                            </h2>
+                        </div>
+
+                        <p className="text-sm text-gray-600 mb-2">
                             {t('or')}{' '}
                             <Link
                                 to="/register"
-                                className="font-medium text-gray-900 hover:text-black"
+                                className="font-medium text-yellow-600 hover:text-yellow-800"
                             >
                                 {t('createAccount')}
                             </Link>
                         </p>
+
                     </div>
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
@@ -232,8 +242,8 @@ const LoginPage: React.FC = () => {
 
                         <div className="flex items-center justify-between">
                             <Checkbox
-                                id="remember-me"
-                                name="remember-me"
+                                id="student-remember-me"
+                                name="student-remember-me"
                                 checked={formData.rememberMe}
                                 onChange={(checked) => setFormData(prev => ({ ...prev, rememberMe: checked }))}
                                 label={t('rememberMe')}
@@ -243,7 +253,7 @@ const LoginPage: React.FC = () => {
                             <div className="text-sm">
                                 <Link
                                     to="/forgot-password"
-                                    className="font-medium text-gray-900 hover:text-black"
+                                    className="font-medium text-yellow-600 hover:text-yellow-800"
                                 >
                                     {t('forgotPassword')}
                                 </Link>
@@ -252,7 +262,7 @@ const LoginPage: React.FC = () => {
 
                         <Button
                             type="submit"
-                            className="w-full"
+                            className="w-full bg-yellow-500 hover:bg-yellow-600"
                             isLoading={isLoading}
                             disabled={isLoading}
                         >
@@ -288,9 +298,17 @@ const LoginPage: React.FC = () => {
                         </Button>
                     </form>
                 </Card>
+                <div className="text-right mt-4">
+                    <Link
+                        to="/admin/login"
+                        className="text-sm text-blue-600 hover:text-blue-800 underline"
+                    >
+                        Login as Administrator →
+                    </Link>
+                </div>
             </div>
         </div>
     );
 };
 
-export default LoginPage;
+export default StudentLoginPage;

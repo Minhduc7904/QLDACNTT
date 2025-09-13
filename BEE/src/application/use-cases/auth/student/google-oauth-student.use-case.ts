@@ -14,6 +14,7 @@ import {
   UnauthorizedException,
 } from '../../../../shared/exceptions/custom-exceptions'
 import { v4 as uuidv4 } from 'uuid'
+import { ROLE_IDS } from 'src/shared/constants/roles.constant'
 
 @Injectable()
 export class GoogleOAuthStudentUseCase {
@@ -22,11 +23,12 @@ export class GoogleOAuthStudentUseCase {
     @Inject('PASSWORD_SERVICE') private readonly passwordService: PasswordService,
     @Inject('JWT_TOKEN_SERVICE') private readonly jwtTokenService: JwtTokenService,
     @Inject('TOKEN_HASH_SERVICE') private readonly tokenHashService: TokenHashService,
-  ) {}
+  ) { }
 
   async execute(googleProfile: GoogleUserProfileDto): Promise<BaseResponseDto<LoginResponseDto>> {
     return await this.unitOfWork.executeInTransaction(async (repos) => {
       // 1. Kiểm tra user đã tồn tại chưa
+      console.log(googleProfile);
       let existingUser = await repos.userRepository.findByEmail(googleProfile.email)
 
       let user, student, studentId: number
@@ -64,17 +66,31 @@ export class GoogleOAuthStudentUseCase {
         const randomPassword = uuidv4()
         const hashedPassword = await this.passwordService.hashPassword(randomPassword)
 
+        let avatarId: number | undefined = undefined
+        console.log(googleProfile.picture);
+        if (googleProfile.picture) {
+          const avatar = await repos.imageRepository.create({
+            url: googleProfile.picture,
+            storageProvider: 'GCS',
+          })
+          avatarId = avatar.imageId
+          console.log(avatarId);
+        }
+
         // Tạo user
-        user = await repos.userRepository.create({
+        const createdUser = await repos.userRepository.create({
           username,
           email: googleProfile.email,
           passwordHash: hashedPassword,
           firstName: googleProfile.firstName,
           lastName: googleProfile.lastName,
           isActive: true,
+          avatarId,
           isEmailVerified: true,
           emailVerifiedAt: new Date(),
         })
+
+        user = await repos.userRepository.findByUsernameWithDetails(createdUser.username)
 
         // Tạo student profile mặc định
         student = await repos.studentRepository.create({
@@ -86,14 +102,17 @@ export class GoogleOAuthStudentUseCase {
         })
 
         studentId = student.studentId
+
+        await repos.roleRepository.assignRoleToUser(user.userId, ROLE_IDS.STUDENT)
       }
 
       // 2. Revoke tất cả refresh tokens cũ (single device login)
       await repos.userRefreshTokenRepository.revokeAllUserTokens(user.userId)
 
       const isEmailVerified = user.isEmailVerified
+      const userEmail = user.email! // Lưu email vào biến để tránh bị modify
       if (!isEmailVerified) {
-        const existingVerifiedUser = await repos.userRepository.findByEmail(user.email!)
+        const existingVerifiedUser = await repos.userRepository.findByEmail(userEmail)
         if (existingVerifiedUser) {
           throw new ConflictException('Email is already verified by another user')
         }
@@ -136,7 +155,7 @@ export class GoogleOAuthStudentUseCase {
         ipAddress: undefined,
         deviceFingerprint: undefined,
       })
-
+      console.log('Login successful', StudentResponseDto.fromUserWithStudent(user, student));
       return {
         success: true,
         message: 'Đăng nhập Google Student thành công',

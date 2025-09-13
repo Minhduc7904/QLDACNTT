@@ -1,13 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { authSlice, appSlice, studentAuthSlice, adminAuthSlice } from './slices';
+import { appSlice, studentAuthSlice, adminAuthSlice } from './slices';
+import studentReducer from './slices/studentSlice';
 import languageReducer from './slices/languageSlice';
 import notificationReducer from './slices/notificationSlice';
 
 export const store = configureStore({
   reducer: {
-    auth: authSlice,
     studentAuth: studentAuthSlice,
     adminAuth: adminAuthSlice,
+    student: studentReducer,
     app: appSlice,
     language: languageReducer,
     notification: notificationReducer,

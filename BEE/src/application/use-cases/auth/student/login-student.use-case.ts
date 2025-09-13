@@ -52,7 +52,6 @@ export class LoginStudentUseCase {
       }
 
       const { user, student } = userWithDetails
-
       // 2. Verify password
       const isPasswordValid = await this.passwordService.comparePassword(loginDto.password, user.passwordHash)
 
@@ -90,11 +89,11 @@ export class LoginStudentUseCase {
         familyId,
         tokenHash,
         expiresAt,
-        userAgent: undefined, // Sẽ implement sau nếu cần
-        ipAddress: undefined, // Sẽ implement sau nếu cần
-        deviceFingerprint: undefined, // Sẽ implement sau nếu cần
+        userAgent: loginDto.userAgent,
+        ipAddress: loginDto.ipAddress,
+        deviceFingerprint: loginDto.deviceFingerprint,
       }
-
+      console.log('refreshTokenData', refreshTokenData)
       await repos.userRefreshTokenRepository.create(refreshTokenData)
 
       // 6. Tạo response theo format mới

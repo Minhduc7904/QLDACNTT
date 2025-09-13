@@ -1,4 +1,6 @@
 // src/domain/entities/user.entity.ts
+import { Image } from "../image/image.entity"
+
 export class User {
   userId: number
   oldUserId?: number
@@ -8,6 +10,8 @@ export class User {
   firstName: string
   lastName: string
   isActive: boolean
+  avatarId?: number
+  avatar?: Image
   isEmailVerified: boolean
   emailVerifiedAt?: Date
   lastLoginAt?: Date
@@ -21,6 +25,8 @@ export class User {
     firstName: string,
     lastName: string,
     isActive: boolean = true,
+    avatarId?: number,
+    avatar?: Image,
     email?: string,
     createdAt?: Date,
     isEmailVerified: boolean = false,
@@ -37,6 +43,8 @@ export class User {
     this.firstName = firstName
     this.lastName = lastName
     this.isActive = isActive
+    this.avatarId = avatarId
+    this.avatar = avatar
     this.isEmailVerified = isEmailVerified
     this.emailVerifiedAt = emailVerifiedAt
     this.lastLoginAt = lastLoginAt
@@ -58,5 +66,9 @@ export class User {
 
   needsEmailVerification(): boolean {
     return this.isEmailProvided() && !this.isEmailVerified
+  }
+
+  getAvatarUrl(): string | null {
+    return this.avatar ? this.avatar.url : null
   }
 }

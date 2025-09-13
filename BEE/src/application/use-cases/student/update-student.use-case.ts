@@ -8,13 +8,14 @@ import {
   ConflictException,
   BusinessLogicException,
 } from '../../../shared/exceptions/custom-exceptions'
+import { BaseResponseDto } from 'src/application/dtos'
 
 @Injectable()
 export class UpdateStudentUseCase {
-  constructor(@Inject('UNIT_OF_WORK') private readonly unitOfWork: IUnitOfWork) {}
+  constructor(@Inject('UNIT_OF_WORK') private readonly unitOfWork: IUnitOfWork) { }
 
-  async execute(studentId: number, dto: UpdateStudentDto): Promise<StudentResponseDto> {
-    return this.unitOfWork.executeInTransaction(async (repos) => {
+  async execute(studentId: number, dto: UpdateStudentDto): Promise<BaseResponseDto<StudentResponseDto>> {
+    const result = await this.unitOfWork.executeInTransaction(async (repos) => {
       // 1. Tìm student với thông tin user
       const student = await repos.studentRepository.findById(studentId)
       if (!student) {
@@ -53,17 +54,25 @@ export class UpdateStudentUseCase {
         return StudentResponseDto.fromStudentEntity(student)
       }
 
-      // 5. Cập nhật User nếu có thay đổi
+      // 5. Kiểm tra và reset email verification nếu email thay đổi
+      if (userUpdateData.email && userUpdateData.email !== student.user.email) {
+        // Nếu email cũ đã được verify và email mới khác email cũ
+        if (student.user.isEmailVerified) {
+          userUpdateData.isEmailVerified = false
+        }
+      }
+
+      // 6. Cập nhật User nếu có thay đổi
       if (hasUserChanges) {
         await repos.userRepository.update(student.user.userId, userUpdateData)
       }
 
-      // 6. Cập nhật Student nếu có thay đổi
+      // 7. Cập nhật Student nếu có thay đổi
       if (hasStudentChanges) {
         await repos.studentRepository.update(studentId, studentUpdateData)
       }
 
-      // 7. Lấy lại student đã cập nhật với thông tin user mới
+      // 8. Lấy lại student đã cập nhật với thông tin user mới
       const updatedStudent = await repos.studentRepository.findById(studentId)
       if (!updatedStudent) {
         throw new BusinessLogicException('Không thể lấy thông tin student sau khi cập nhật')
@@ -71,6 +80,11 @@ export class UpdateStudentUseCase {
 
       return StudentResponseDto.fromStudentEntity(updatedStudent)
     })
+
+    return BaseResponseDto.success(
+      'Cập nhật thông tin student thành công',
+      result,
+    )
   }
 
   /**

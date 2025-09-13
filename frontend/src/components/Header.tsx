@@ -2,21 +2,21 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { BookOpen, FileText, BarChart3, LogOut, User, ChevronDown, Settings, Globe } from 'lucide-react';
-import { useAuth, useTranslation } from '../hooks';
-import { clearAuth } from '../store/slices/authSlice';
+import { useStudentAuth, useTranslation } from '../hooks';
+import { clearStudentAuth } from '../store/slices/studentAuthSlice';
 import { setLanguage } from '../store/slices/languageSlice';
-import { ClickOutside, NavLink, BeeLogoBrand } from './common';
+import { ClickOutside, NavLink, BeeLogoBrand, Avatar } from './common';
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { user } = useAuth();
+    const { user } = useStudentAuth();
     const { t, currentLanguage } = useTranslation();
     const [showUserMenu, setShowUserMenu] = useState(false);
 
     const handleLogout = () => {
-        dispatch(clearAuth());
-        navigate('/login');
+        dispatch(clearStudentAuth());
+        navigate('/student/login');
     };
 
     const toggleLanguage = () => {
@@ -38,19 +38,19 @@ const Header: React.FC = () => {
                     {/* Center - Navigation Links */}
                     <nav className="hidden md:flex flex-1 justify-center">
                         <div className="flex space-x-2">
-                            <NavLink 
+                            <NavLink
                                 to="/dashboard"
                                 icon={BarChart3}
                                 label={t('overview')}
                             />
 
-                            <NavLink 
+                            <NavLink
                                 to="/classes"
                                 icon={BookOpen}
                                 label={t('classes')}
                             />
 
-                            <NavLink 
+                            <NavLink
                                 to="/exams"
                                 icon={FileText}
                                 label={t('exams')}
@@ -76,17 +76,14 @@ const Header: React.FC = () => {
                                 className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
                             >
                                 {/* User Avatar */}
-                                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                                    {user?.avatar ? (
-                                        <img
-                                            src={user.avatar}
-                                            alt={user.fullName || 'User'}
-                                            className="w-8 h-8 rounded-full object-cover"
-                                        />
-                                    ) : (
-                                        <User className="w-4 h-4 text-gray-600" />
-                                    )}
-                                </div>
+                                <Avatar
+                                    imageUrl={user?.imageUrls?.url}
+                                    altImageUrl={user?.imageUrls?.anotherUrl}
+                                    firstName={user?.firstName}
+                                    lastName={user?.lastName}
+                                    fullName={user?.fullName}
+                                    size="sm"
+                                />
 
                                 {/* User Info */}
                                 <div className="hidden sm:block text-left">
@@ -94,7 +91,7 @@ const Header: React.FC = () => {
                                         {user?.fullName || 'User'}
                                     </p>
                                     <p className="text-xs text-gray-500">
-                                        {user?.email}
+                                        {(user?.isEmailVerified && user?.email) && user.email}
                                     </p>
                                 </div>
 
@@ -108,14 +105,14 @@ const Header: React.FC = () => {
                                         <p className="text-sm font-medium text-gray-900">
                                             {user?.fullName || 'User'}
                                         </p>
-                                        <p className="text-xs text-gray-500">{user?.email}</p>
+                                        <p className="text-xs text-gray-500">{user?.isEmailVerified && user?.email }</p>
                                         <p className="text-xs text-yellow-600 font-medium mt-1">
                                             {t('student')}
                                         </p>
                                     </div>
 
                                     <Link
-                                        to="/profile"
+                                        to="/student/profile"
                                         className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                                         onClick={() => setShowUserMenu(false)}
                                     >
@@ -151,21 +148,21 @@ const Header: React.FC = () => {
             {/* Mobile Navigation */}
             <div className="md:hidden border-t border-gray-200">
                 <nav className="px-4 py-3 space-y-2">
-                    <NavLink 
+                    <NavLink
                         to="/dashboard"
                         icon={BarChart3}
                         label={t('overview')}
                         className="w-full justify-start"
                     />
 
-                    <NavLink 
+                    <NavLink
                         to="/classes"
                         icon={BookOpen}
                         label={t('classes')}
                         className="w-full justify-start"
                     />
 
-                    <NavLink 
+                    <NavLink
                         to="/exams"
                         icon={FileText}
                         label={t('exams')}

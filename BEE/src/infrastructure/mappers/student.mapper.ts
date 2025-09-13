@@ -1,5 +1,6 @@
 // src/infrastructure/mappers/student.mapper.ts
 import { Student } from '../../domain/entities/user/student.entity'
+import { UserMapper } from './user.mapper'
 
 /**
  * Mapper class để convert từ Prisma Student models sang Domain Student entities
@@ -18,6 +19,7 @@ export class StudentMapper {
       prismaStudent.studentPhone ?? undefined,
       prismaStudent.parentPhone ?? undefined,
       prismaStudent.school ?? undefined,
+      UserMapper.toDomainUser(prismaStudent.user) ?? undefined
     )
   }
 

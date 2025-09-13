@@ -1,17 +1,16 @@
 import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { LoadingSpinner } from '../components';
 import { useNotification } from '../hooks';
-import { setUser } from '../store/slices/authSlice';
 import { STORAGE_KEYS } from '../constants';
+import { useStudentAuth } from '../hooks';
 
 const AuthCallbackPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     const { showSuccess, showError } = useNotification();
     const [isProcessed, setIsProcessed] = React.useState(false);
+    const { setStudent } = useStudentAuth();
 
     useEffect(() => {
         if (isProcessed) return; // Tránh xử lý nhiều lần
@@ -28,7 +27,7 @@ const AuthCallbackPage: React.FC = () => {
             if (error) {
                 console.error('Google OAuth error from backend:', error);
                 const errorMessage = decodeURIComponent(error);
-                
+
                 // Hiển thị thông báo lỗi cụ thể
                 if (errorMessage.includes('Username đã tồn tại')) {
                     showError('Username đã tồn tại. Vui lòng thử lại hoặc liên hệ admin.', 'Lỗi đăng nhập');
@@ -39,8 +38,8 @@ const AuthCallbackPage: React.FC = () => {
                 } else {
                     showError(errorMessage, 'Lỗi đăng nhập Google');
                 }
-                
-                navigate('/login', { replace: true });
+
+                navigate('/student/login', { replace: true });
                 return;
             }
 
@@ -52,20 +51,19 @@ const AuthCallbackPage: React.FC = () => {
 
                     // Parse JSON
                     const user = JSON.parse(decodedUserData);
-
                     // Lưu vào localStorage
                     localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
                     localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-                    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+                    localStorage.setItem(STORAGE_KEYS.STUDENT_USER_DATA, JSON.stringify(user));
 
                     // Cập nhật Redux state
-                    dispatch(setUser(user));
+                    setStudent(user)
 
                     // Hiển thị thông báo thành công
                     showSuccess('Đăng nhập Google thành công!', 'Chào mừng');
 
-                    // Chuyển hướng đến dashboard
-                    navigate('/dashboard', { replace: true });
+                    // Chuyển hướng đến student dashboard
+                    navigate('/student/dashboard', { replace: true });
                 } catch (parseError) {
                     console.error('Error parsing Google auth callback:', parseError);
                     console.error('Raw userDataBase64:', userDataBase64);
@@ -75,12 +73,12 @@ const AuthCallbackPage: React.FC = () => {
                         console.error('Failed to decode Base64:', decodeError);
                     }
                     showError('Lỗi xử lý đăng nhập Google: ' + (parseError as Error).message);
-                    navigate('/login', { replace: true });
+                    navigate('/student/login', { replace: true });
                 }
             } else {
                 // Không có thông tin cần thiết
                 showError('Lỗi đăng nhập Google');
-                navigate('/login', { replace: true });
+                navigate('/student/login', { replace: true });
             }
         };
 
@@ -90,12 +88,12 @@ const AuthCallbackPage: React.FC = () => {
         const timeout = setTimeout(() => {
             if (!isProcessed) {
                 showError('Timeout xử lý đăng nhập Google');
-                navigate('/login', { replace: true });
+                navigate('/student/login', { replace: true });
             }
         }, 10000);
 
         return () => clearTimeout(timeout);
-    }, [searchParams, dispatch, navigate, showSuccess, showError, isProcessed]);
+    }, [searchParams, navigate, showSuccess, showError, isProcessed]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">

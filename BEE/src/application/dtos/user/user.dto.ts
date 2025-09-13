@@ -1,9 +1,10 @@
 // src/application/dtos/user/user-response.dto.ts
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsOptional, IsString, IsEmail, MaxLength, MinLength } from 'class-validator'
+import { IsOptional, IsString, IsEmail, MaxLength, MinLength, IsBoolean } from 'class-validator'
 import { Trim } from '../../../shared/decorators/trim.decorator'
 import { SWAGGER_PROPERTIES } from '../../../shared/constants/swagger-properties.constants'
 import { VALIDATION_MESSAGES } from '../../../shared/constants/validation-messages'
+import { ImageUrlDto } from '../image/image.dto'
 
 export class UserResponseDto {
   @ApiProperty(SWAGGER_PROPERTIES.USER_ID)
@@ -30,6 +31,9 @@ export class UserResponseDto {
   @ApiProperty(SWAGGER_PROPERTIES.IS_EMAIL_VERIFIED)
   isEmailVerified: boolean
 
+  @ApiPropertyOptional(SWAGGER_PROPERTIES.IMAGE_URLS)
+  imageUrls?: ImageUrlDto
+
   @ApiPropertyOptional(SWAGGER_PROPERTIES.EMAIL_VERIFIED_AT)
   emailVerifiedAt?: Date
 
@@ -51,6 +55,14 @@ export class UserResponseDto {
    * Factory method tạo từ User entity
    */
   static fromUser(user: any): UserResponseDto {
+    // Map avatar if exists
+    let imageUrls: ImageUrlDto | undefined
+    if (user.avatar) {
+      imageUrls = new ImageUrlDto()
+      imageUrls.url = user.avatar.url
+      imageUrls.anotherUrl = user.avatar.anotherUrl || user.avatar.url
+    }
+
     return new UserResponseDto({
       userId: user.userId,
       username: user.username,
@@ -59,6 +71,7 @@ export class UserResponseDto {
       lastName: user.lastName,
       isActive: user.isActive,
       isEmailVerified: user.isEmailVerified,
+      imageUrls: imageUrls,
       emailVerifiedAt: user.emailVerifiedAt,
       lastLoginAt: user.lastLoginAt,
       createdAt: user.createdAt,
@@ -109,4 +122,12 @@ export class UpdateUserDto {
   @IsString({ message: VALIDATION_MESSAGES.FIELD_INVALID('Tên') })
   @MaxLength(50, { message: VALIDATION_MESSAGES.FIELD_MAX('Tên', 50) })
   firstName?: string
+
+  @ApiPropertyOptional({
+    description: 'Trạng thái xác thực email',
+    example: false,
+  })
+  @IsOptional()
+  @IsBoolean({ message: VALIDATION_MESSAGES.FIELD_INVALID('Trạng thái xác thực email') })
+  isEmailVerified?: boolean
 }

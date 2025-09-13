@@ -15,7 +15,7 @@ import { NumberUtil } from '../../shared/utils/number.util'
 import { PaginationMapper } from '../mappers/pagination.mapper'
 
 export class PrismaStudentRepository implements IStudentRepository {
-  constructor(private readonly prisma: PrismaService | any) {} // any để hỗ trợ transaction client
+  constructor(private readonly prisma: PrismaService | any) { } // any để hỗ trợ transaction client
 
   async create(data: CreateStudentData): Promise<Student> {
     const numericUserId = NumberUtil.ensureValidId(data.userId, 'User ID')
@@ -39,19 +39,7 @@ export class PrismaStudentRepository implements IStudentRepository {
     const prismaStudent = await this.prisma.student.findUnique({
       where: { studentId: numericId },
       include: {
-        user: {
-          select: {
-            userId: true,
-            username: true,
-            email: true,
-            firstName: true,
-            lastName: true,
-            isActive: true,
-            createdAt: true,
-            updatedAt: true,
-            lastLoginAt: true,
-          },
-        },
+        user: true
       },
     })
 
@@ -66,19 +54,7 @@ export class PrismaStudentRepository implements IStudentRepository {
     const prismaStudent = await this.prisma.student.findUnique({
       where: { userId: numericUserId },
       include: {
-        user: {
-          select: {
-            userId: true,
-            username: true,
-            email: true,
-            firstName: true,
-            lastName: true,
-            isActive: true,
-            createdAt: true,
-            updatedAt: true,
-            lastLoginAt: true,
-          },
-        },
+        user: true
       },
     })
 

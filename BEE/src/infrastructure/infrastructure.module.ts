@@ -9,6 +9,7 @@ import { PrismaUserRepository } from './repositories/prisma-user.repository'
 import { PrismaRoleRepository } from './repositories/prisma-role.repository'
 import { PrismaStudentRepository } from './repositories/prisma-student.repository'
 import { PrismaEmailVerificationTokenRepository } from './repositories/prisma-email-verification-token.repository'
+import { PrismaImageRepository } from './repositories/prisma-image.repository'
 import { PasswordService } from './services/password.service'
 import { JwtTokenService } from './services/jwt.service'
 import { TokenHashService } from './services/token-hash.service'
@@ -58,6 +59,11 @@ import httpClientConfig from '../config/http-client.config'
       inject: [PrismaService],
     },
     {
+      provide: 'IImageRepository',
+      useFactory: (prisma: PrismaService) => new PrismaImageRepository(prisma),
+      inject: [PrismaService],
+    },
+    {
       provide: 'PASSWORD_SERVICE',
       useClass: PasswordService,
     },
@@ -90,6 +96,7 @@ import httpClientConfig from '../config/http-client.config'
     'IUserRepository',
     'IRoleRepository',
     'IStudentRepository',
+    'IImageRepository',
     'IEmailVerificationTokenRepository',
     'PASSWORD_SERVICE',
     'JWT_TOKEN_SERVICE',
@@ -100,4 +107,4 @@ import httpClientConfig from '../config/http-client.config'
     'IEmailService',
   ],
 })
-export class InfrastructureModule {}
+export class InfrastructureModule { }

@@ -99,7 +99,7 @@ const HomePage: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-50">
             <LanguageToggle />
-            
+
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12">
@@ -117,20 +117,36 @@ const HomePage: React.FC = () => {
                     <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
                         {t('learningPlatformDescription')}
                     </p>
-                    <div className="mt-8 flex justify-center space-x-4">
-                        <Button 
-                            onClick={() => navigate('/login')}
-                            className="px-8 py-3"
-                        >
-                            {t('getStarted')}
-                        </Button>
-                        <Button 
-                            variant="outline"
-                            onClick={() => navigate('/register')}
-                            className="px-8 py-3"
-                        >
-                            {t('createAccount')}
-                        </Button>
+                    <div className="mt-8 flex flex-col items-center space-y-4">
+                        {/* Primary Actions */}
+                        <div className="flex justify-center space-x-4">
+                            <Button
+                                onClick={() => navigate('/student/login')}
+                                className="px-8 py-3 bg-yellow-500 hover:bg-yellow-600"
+                            >
+                                {currentLanguage === 'vi' ? 'Đăng nhập - Học sinh' : 'Login - Student'}
+                            </Button>
+                            <Button
+                                onClick={() => navigate('/admin/login')}
+                                className="px-8 py-3 bg-blue-600 hover:bg-blue-700"
+                            >
+                                {currentLanguage === 'vi' ? 'Đăng nhập - Quản trị' : 'Login - Admin'}
+                            </Button>
+                        </div>
+
+                        {/* Secondary Action */}
+                        <div className="text-center">
+                            <span className="text-gray-600 text-sm">
+                                {currentLanguage === 'vi' ? 'Chưa có tài khoản?' : "Don't have an account?"}
+                            </span>
+                            <Button
+                                variant="outline"
+                                onClick={() => navigate('/register')}
+                                className="ml-2 px-6 py-2"
+                            >
+                                {t('createAccount')}
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
@@ -141,20 +157,20 @@ const HomePage: React.FC = () => {
                             <BookOpen className="inline-block w-8 h-8 mr-3 text-blue-600" />
                             {t('availableClasses')}
                         </h2>
-                        <Link 
-                            to="/classes" 
+                        <Link
+                            to="/classes"
                             className="text-blue-600 hover:text-blue-800 font-medium flex items-center"
                         >
                             {t('viewAll')} <ChevronRight className="w-4 h-4 ml-1" />
                         </Link>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {classes.map((classItem) => (
                             <Card key={classItem.id} className="hover:shadow-lg transition-shadow duration-300 cursor-pointer">
                                 <div className="relative">
-                                    <img 
-                                        src={classItem.image} 
+                                    <img
+                                        src={classItem.image}
                                         alt={classItem.name}
                                         className="w-full h-48 object-cover rounded-t-lg"
                                     />
@@ -177,7 +193,7 @@ const HomePage: React.FC = () => {
                                             {currentLanguage === 'vi' ? classItem.duration : classItem.durationEn}
                                         </div>
                                     </div>
-                                    <Button 
+                                    <Button
                                         className="w-full mt-4"
                                         onClick={() => navigate(`/classes/${classItem.id}`)}
                                     >
@@ -196,14 +212,14 @@ const HomePage: React.FC = () => {
                             <FileText className="inline-block w-8 h-8 mr-3 text-green-600" />
                             {t('practiceExams')}
                         </h2>
-                        <Link 
-                            to="/exams" 
+                        <Link
+                            to="/exams"
                             className="text-green-600 hover:text-green-800 font-medium flex items-center"
                         >
                             {t('viewAll')} <ChevronRight className="w-4 h-4 ml-1" />
                         </Link>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {exams.map((exam) => (
                             <Card key={exam.id} className="hover:shadow-lg transition-shadow duration-300 cursor-pointer">
@@ -217,17 +233,16 @@ const HomePage: React.FC = () => {
                                                 {currentLanguage === 'vi' ? exam.subject : exam.subjectEn}
                                             </p>
                                         </div>
-                                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                            exam.difficulty === 'Dễ' || exam.difficultyEn === 'Easy' 
-                                                ? 'bg-green-100 text-green-800'
-                                                : exam.difficulty === 'Trung bình' || exam.difficultyEn === 'Medium'
+                                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${exam.difficulty === 'Dễ' || exam.difficultyEn === 'Easy'
+                                            ? 'bg-green-100 text-green-800'
+                                            : exam.difficulty === 'Trung bình' || exam.difficultyEn === 'Medium'
                                                 ? 'bg-yellow-100 text-yellow-800'
                                                 : 'bg-red-100 text-red-800'
-                                        }`}>
+                                            }`}>
                                             {currentLanguage === 'vi' ? exam.difficulty : exam.difficultyEn}
                                         </div>
                                     </div>
-                                    
+
                                     <div className="space-y-2 text-sm text-gray-600 mb-4">
                                         <div className="flex items-center justify-between">
                                             <span>{t('duration')}:</span>
@@ -245,8 +260,8 @@ const HomePage: React.FC = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    
-                                    <Button 
+
+                                    <Button
                                         variant="outline"
                                         className="w-full"
                                         onClick={() => navigate(`/exams/${exam.id}`)}
@@ -273,22 +288,33 @@ const HomePage: React.FC = () => {
                     <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
                         {t('joinThousands')}
                     </p>
-                    <div className="flex justify-center space-x-4">
-                        <Button 
+                    <div className="flex flex-col items-center space-y-4">
+                        <Button
                             size="lg"
-                            className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-8"
                             onClick={() => navigate('/register')}
                         >
                             {t('signUpNow')}
                         </Button>
-                        <Button 
-                            variant="outline" 
-                            size="lg"
-                            className="border-yellow-500 text-yellow-700 hover:bg-yellow-50"
-                            onClick={() => navigate('/login')}
-                        >
-                            {t('signIn')}
-                        </Button>
+
+                        <div className="flex justify-center space-x-4">
+                            <Button
+                                variant="outline"
+                                size="md"
+                                className="border-yellow-500 text-yellow-700 hover:bg-yellow-50"
+                                onClick={() => navigate('/student/login')}
+                            >
+                                {currentLanguage === 'vi' ? 'Đăng nhập học sinh' : 'Student Login'}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="md"
+                                className="border-blue-500 text-blue-700 hover:bg-blue-50"
+                                onClick={() => navigate('/admin/login')}
+                            >
+                                {currentLanguage === 'vi' ? 'Đăng nhập quản trị' : 'Admin Login'}
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>

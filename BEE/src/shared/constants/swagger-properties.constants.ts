@@ -459,6 +459,14 @@ export const SWAGGER_PROPERTIES = {
     description: 'Đường dẫn API',
     example: '/auth/register/admin',
   },
+
+  IMAGE_URLS: {
+    description: 'Danh sách URL của ảnh',
+    example: {
+      url: 'https://example.com/avatar.jpg',
+      anotherUrl: 'https://example.com/cover.jpg',
+    },
+  },
 }
 
 // Helper function để tạo API Property object

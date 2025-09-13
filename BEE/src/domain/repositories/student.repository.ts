@@ -9,7 +9,7 @@ import {
 
 export interface IStudentRepository {
   create(data: CreateStudentData): Promise<Student>
-  findById(id: number): Promise<Student | null>
+  findById(id: number | string): Promise<Student | null>
   findByUserId(userId: number): Promise<Student | null>
   update(id: number, data: Partial<Student>): Promise<Student>
   delete(id: number): Promise<boolean>

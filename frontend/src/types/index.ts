@@ -17,7 +17,7 @@ export interface User {
   email?: string;
   passwordHash: string;
   avatarId?: number;
-  avatar?: Image;
+  imageUrls?: Image;
   firstName: string;
   lastName: string;
   fullName: string;
@@ -48,8 +48,12 @@ export interface Admin extends User {
 }
 
 export interface LoginRequest {
-  username: string;
+  username?: string;
+  email?: string;
   password: string;
+  userAgent?: string;
+  ipAddress?: string;
+  deviceFingerprint?: string;
 }
 
 export interface RegisterStudentRequest {
@@ -149,9 +153,9 @@ export interface Image {
   url: string;
   anotherUrl?: string;
   mimeType?: string;
-  storageProvider: 'LOCAL' | 'S3' | 'GCS' | 'EXTERNAL';
-  createdAt: string;
-  updatedAt: string;
+  storageProvider?: 'LOCAL' | 'S3' | 'GCS' | 'EXTERNAL';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Common Types

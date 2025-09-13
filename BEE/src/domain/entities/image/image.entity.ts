@@ -10,7 +10,7 @@ export class Image {
     public readonly storageProvider: StorageProvider = StorageProvider.EXTERNAL,
     public readonly createdAt: Date = new Date(),
     public readonly updatedAt: Date = new Date(),
-  ) {}
+  ) { }
 
   hasAlternativeUrl(): boolean {
     return !!this.anotherUrl

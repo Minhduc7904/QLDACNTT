@@ -6,7 +6,9 @@ import {
     logoutStudentAllDevices,
     clearStudentError,
     initializeStudentAuth,
-    getStudentProfile
+    setStudentAccessToken,
+    setStudentRefreshToken,
+    setStudentUser
 } from '../store/slices/studentAuthSlice';
 import { LoginRequest, RegisterStudentRequest } from '../types';
 
@@ -36,12 +38,20 @@ export const useStudentAuth = () => {
         dispatch(initializeStudentAuth());
     };
 
-    const fetchProfile = async () => {
-        return dispatch(getStudentProfile());
-    };
-
     const clearAuthError = () => {
         dispatch(clearStudentError());
+    };
+
+    const setAccessToken = (token: string) => {
+        dispatch(setStudentAccessToken(token));
+    };
+
+    const setRefreshToken = (token: string) => {
+        dispatch(setStudentRefreshToken(token));
+    };
+
+    const setStudent = (user: any) => {
+        dispatch(setStudentUser(user));
     };
 
     return {
@@ -59,7 +69,9 @@ export const useStudentAuth = () => {
         logout,
         logoutAllDevices,
         initialize,
-        fetchProfile,
         clearAuthError,
+        setAccessToken,
+        setRefreshToken,
+        setStudent
     };
 };

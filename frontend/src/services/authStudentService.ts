@@ -23,9 +23,10 @@ export class AuthStudentService {
         return apiService.post(API_ENDPOINTS.AUTH.COMMON.REFRESH);
     }
 
-    async getProfile(): Promise<ApiResponse<Student>> {
-        return apiService.get(API_ENDPOINTS.AUTH.STUDENT.PROFILE);
+    async sendVerificationEmail(userId: number): Promise<ApiResponse<{ emailSent: boolean; expiresAt: string }>> {
+        return apiService.post(`${API_ENDPOINTS.AUTH.EMAIL_VERIFICATION.SEND}/${userId}`);
     }
+
 }
 
 export const authStudentService = new AuthStudentService();

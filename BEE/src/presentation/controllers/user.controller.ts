@@ -44,35 +44,6 @@ export class UserController {
     return await this.updateUserUseCase.execute(id, updateDto)
   }
 
-  @Patch(':id/student')
-  @ApiOperation({
-    summary: 'Cập nhật thông tin student',
-    description: 'Cập nhật thông tin student bao gồm cả thông tin user cơ bản',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Cập nhật student thành công',
-    type: StudentResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Student không tồn tại',
-  })
-  @ApiResponse({
-    status: 409,
-    description: 'Username hoặc email đã tồn tại',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Dữ liệu không hợp lệ hoặc lỗi business logic',
-  })
-  async updateStudent(
-    @Param('id', ParseIntPipe) studentId: number,
-    @Body() updateDto: UpdateStudentDto,
-  ): Promise<StudentResponseDto> {
-    return await this.updateStudentUseCase.execute(studentId, updateDto)
-  }
-
   @Patch(':id/admin')
   @ApiOperation({
     summary: 'Cập nhật thông tin admin',

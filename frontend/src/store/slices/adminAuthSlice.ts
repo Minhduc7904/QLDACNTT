@@ -6,8 +6,8 @@ import { createAuthThunkHandler, createAsyncThunkHandler } from '../../utils';
 
 // Storage keys specific to admin
 const ADMIN_STORAGE_KEYS = {
-    ACCESS_TOKEN: STORAGE_KEYS.ADMIN_ACCESS_TOKEN,
-    REFRESH_TOKEN: STORAGE_KEYS.ADMIN_REFRESH_TOKEN,
+    ACCESS_TOKEN: STORAGE_KEYS.ACCESS_TOKEN,
+    REFRESH_TOKEN: STORAGE_KEYS.REFRESH_TOKEN,
     USER_DATA: STORAGE_KEYS.ADMIN_USER_DATA,
 };
 
@@ -18,7 +18,10 @@ const initialState: AdminAuthState = {
     refreshToken: localStorage.getItem(ADMIN_STORAGE_KEYS.REFRESH_TOKEN),
     isLoading: false,
     error: null,
-    isAuthenticated: !!localStorage.getItem(ADMIN_STORAGE_KEYS.ACCESS_TOKEN),
+    isAuthenticated: (!!localStorage.getItem(ADMIN_STORAGE_KEYS.ACCESS_TOKEN) &&
+        !!localStorage.getItem(ADMIN_STORAGE_KEYS.REFRESH_TOKEN) &&
+        !!localStorage.getItem(ADMIN_STORAGE_KEYS.USER_DATA)
+    ),
 };
 
 // Async thunks

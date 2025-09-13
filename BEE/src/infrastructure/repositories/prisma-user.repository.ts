@@ -8,7 +8,7 @@ import { UserMapper } from '../mappers/user.mapper'
 import { NumberUtil } from '../../shared/utils/number.util'
 
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaService | any) {} // any để hỗ trợ transaction client
+  constructor(private readonly prisma: PrismaService | any) { } // any để hỗ trợ transaction client
 
   async create(data: CreateUserData): Promise<User> {
     const prismaUser = await this.prisma.user.create({
@@ -19,6 +19,7 @@ export class PrismaUserRepository implements IUserRepository {
         firstName: data.firstName,
         lastName: data.lastName,
         oldUserId: data.oldUserId,
+        avatarId: data.avatarId,
         isActive: data.isActive ?? true,
         isEmailVerified: data.isEmailVerified ?? false,
         emailVerifiedAt: data.emailVerifiedAt,
@@ -57,6 +58,7 @@ export class PrismaUserRepository implements IUserRepository {
       include: {
         admin: true,
         student: true,
+        avatar: true,
       },
     })
 
@@ -73,6 +75,7 @@ export class PrismaUserRepository implements IUserRepository {
       include: {
         admin: true,
         student: true,
+        avatar: true,
       },
     })
 
@@ -81,7 +84,7 @@ export class PrismaUserRepository implements IUserRepository {
 
   async findByEmail(email: string): Promise<User | null> {
     const prismaUser = await this.prisma.user.findFirst({
-      where: { email, isEmailVerified: true },
+      where: { email: email, isEmailVerified: true },
     })
 
     return UserMapper.toDomainUser(prismaUser)
@@ -108,6 +111,7 @@ export class PrismaUserRepository implements IUserRepository {
         firstName: data.firstName,
         lastName: data.lastName,
         isActive: data.isActive,
+        avatarId: data.avatarId,
         isEmailVerified: data.isEmailVerified,
         emailVerifiedAt: data.emailVerifiedAt,
         lastLoginAt: data.lastLoginAt,

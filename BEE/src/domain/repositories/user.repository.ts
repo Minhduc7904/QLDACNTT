@@ -11,6 +11,7 @@ export interface CreateUserData {
   lastName: string
   oldUserId?: number
   isActive?: boolean
+  avatarId?: number
   isEmailVerified?: boolean
   emailVerifiedAt?: Date
   lastLoginAt?: Date
@@ -24,6 +25,7 @@ export interface UpdateUserData {
   firstName?: string
   lastName?: string
   isActive?: boolean
+  avatarId?: number
   isEmailVerified?: boolean
   emailVerifiedAt?: Date
   lastLoginAt?: Date

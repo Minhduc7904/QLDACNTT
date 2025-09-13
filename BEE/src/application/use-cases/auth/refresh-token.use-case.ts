@@ -17,12 +17,13 @@ export class RefreshTokenUseCase {
     @Inject('UNIT_OF_WORK') private readonly unitOfWork: IUnitOfWork,
     @Inject('JWT_TOKEN_SERVICE') private readonly jwtTokenService: JwtTokenService,
     @Inject('TOKEN_HASH_SERVICE') private readonly tokenHashService: TokenHashService,
-  ) {}
+  ) { }
 
   async execute(refreshDto: RefreshTokenRequestDto): Promise<BaseResponseDto<RefreshTokenResponseDto>> {
     return await this.unitOfWork.executeInTransaction(async (repos) => {
       // 1. Verify refresh token format và decode
       let decodedToken
+      console.log('Refresh token: ', refreshDto.refreshToken)
       try {
         decodedToken = this.jwtTokenService.verifyRefreshToken(refreshDto.refreshToken)
       } catch (error) {
@@ -101,6 +102,8 @@ export class RefreshTokenUseCase {
         refreshToken: newRefreshToken,
         expiresIn: 3600, // 1 hour
       }
+
+      console.log('Refresh token response: ', refreshTokenResponse)
 
       return BaseResponseDto.success('Token đã được làm mới thành công', refreshTokenResponse)
     })

@@ -10,6 +10,8 @@ export { default as Checkbox } from './Checkbox';
 export { default as RadioButton } from './RadioButton';
 export { default as Dropdown } from './Dropdown';
 export type { DropdownItem } from './Dropdown';
+export { default as FormDropdown } from './FormDropdown';
 export { default as NavLink } from './NavLink';
 export { default as BeeIcon } from './BeeIcon';
 export { default as BeeLogoBrand } from './BeeLogoBrand';
+export { default as Avatar } from './Avatar';

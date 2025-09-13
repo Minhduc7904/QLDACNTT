@@ -27,7 +27,7 @@ export class AuthService {
     try {
       // Verify JWT token
       const payload = await this.jwtTokenService.verifyAccessToken(token)
-
+      
       // Get user roles from database
       const userRoles = await this.roleRepository.getUserRoles(payload.sub)
 

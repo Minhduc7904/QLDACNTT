@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { IImageRepository, CreateImageData } from '../../domain/repositories/image.repository'
 import { Image } from '../../domain/entities/image/image.entity'
+import { NumberUtil } from '../../shared/utils/number.util'
 
 @Injectable()
 export class PrismaImageRepository implements IImageRepository {
   constructor(
     private readonly prisma: any, // PrismaService or TransactionClient
-  ) {}
+  ) { }
 
   async create(data: CreateImageData): Promise<Image> {
     const image = await this.prisma.image.create({
@@ -32,8 +33,10 @@ export class PrismaImageRepository implements IImageRepository {
   }
 
   async findById(id: number): Promise<Image | null> {
+    const numericUserId = NumberUtil.ensureValidId(id, 'Image')
+
     const image = await this.prisma.image.findUnique({
-      where: { imageId: id },
+      where: { imageId: numericUserId },
     })
 
     if (!image) return null
@@ -70,8 +73,10 @@ export class PrismaImageRepository implements IImageRepository {
   }
 
   async findByAdmin(adminId: number): Promise<Image[]> {
+    const numericAdminId = NumberUtil.ensureValidId(adminId, 'Admin')
+
     const images = await this.prisma.image.findMany({
-      where: { adminId },
+      where: { adminId: numericAdminId },
       orderBy: { createdAt: 'desc' },
     })
 
@@ -91,8 +96,10 @@ export class PrismaImageRepository implements IImageRepository {
   }
 
   async update(id: number, data: Partial<CreateImageData>): Promise<Image> {
+    const numericUserId = NumberUtil.ensureValidId(id, 'Image')
+
     const image = await this.prisma.image.update({
-      where: { imageId: id },
+      where: { imageId: numericUserId },
       data: {
         url: data.url,
         anotherUrl: data.anotherUrl,
@@ -114,9 +121,10 @@ export class PrismaImageRepository implements IImageRepository {
   }
 
   async delete(id: number): Promise<boolean> {
+    const numericUserId = NumberUtil.ensureValidId(id, 'Image')
     try {
       await this.prisma.image.delete({
-        where: { imageId: id },
+        where: { imageId: numericUserId },
       })
       return true
     } catch (error) {

@@ -6,8 +6,8 @@ import { createAuthThunkHandler, createAsyncThunkHandler } from '../../utils';
 
 // Storage keys specific to student
 const STUDENT_STORAGE_KEYS = {
-    ACCESS_TOKEN: STORAGE_KEYS.STUDENT_ACCESS_TOKEN,
-    REFRESH_TOKEN: STORAGE_KEYS.STUDENT_REFRESH_TOKEN,
+    ACCESS_TOKEN: STORAGE_KEYS.ACCESS_TOKEN,
+    REFRESH_TOKEN: STORAGE_KEYS.REFRESH_TOKEN,
     USER_DATA: STORAGE_KEYS.STUDENT_USER_DATA,
 };
 
@@ -18,17 +18,32 @@ const initialState: StudentAuthState = {
     refreshToken: localStorage.getItem(STUDENT_STORAGE_KEYS.REFRESH_TOKEN),
     isLoading: false,
     error: null,
-    isAuthenticated: !!localStorage.getItem(STUDENT_STORAGE_KEYS.ACCESS_TOKEN),
+    isAuthenticated: (!!localStorage.getItem(STUDENT_STORAGE_KEYS.ACCESS_TOKEN) &&
+        !!localStorage.getItem(STUDENT_STORAGE_KEYS.REFRESH_TOKEN) &&
+        !!localStorage.getItem(STUDENT_STORAGE_KEYS.USER_DATA)
+    ),
 };
 
 // Async thunks
 export const loginStudent = createAsyncThunk<
     { user: Student; token: string },
-    LoginRequest
+    Omit<LoginRequest, 'userAgent' | 'ipAddress' | 'deviceFingerprint'>
 >(
     'studentAuth/login',
     createAuthThunkHandler(
-        (credentials: LoginRequest) => authStudentService.login(credentials),
+        async (credentials: Omit<LoginRequest, 'userAgent' | 'ipAddress' | 'deviceFingerprint'>) => {
+            // Thu thập thông tin device
+            const { collectDeviceInfo } = await import('../../utils/deviceFingerprint');
+            const deviceInfo = await collectDeviceInfo();
+
+            // Kết hợp credentials với device info
+            const loginData: LoginRequest = {
+                ...credentials,
+                ...deviceInfo
+            };
+
+            return authStudentService.login(loginData);
+        },
         'Đăng nhập học sinh thất bại',
         {
             successMessage: 'Đăng nhập thành công!',
@@ -116,20 +131,7 @@ export const refreshStudentToken = createAsyncThunk<string>(
     )
 );
 
-export const getStudentProfile = createAsyncThunk<Student>(
-    'studentAuth/getProfile',
-    createAuthThunkHandler(
-        () => authStudentService.getProfile(),
-        'Lấy thông tin học sinh thất bại',
-        {
-            showSuccessNotification: false,
-            onSuccess: (response) => {
-                localStorage.setItem(STUDENT_STORAGE_KEYS.USER_DATA, JSON.stringify(response.data));
-                return response.data;
-            }
-        }
-    )
-);
+
 
 // Student Auth slice
 const studentAuthSlice = createSlice({
@@ -156,7 +158,6 @@ const studentAuthSlice = createSlice({
             const accessToken = localStorage.getItem(STUDENT_STORAGE_KEYS.ACCESS_TOKEN);
             const refreshToken = localStorage.getItem(STUDENT_STORAGE_KEYS.REFRESH_TOKEN);
             const userData = localStorage.getItem(STUDENT_STORAGE_KEYS.USER_DATA);
-
             if (accessToken && userData) {
                 try {
                     state.accessToken = accessToken;
@@ -167,6 +168,12 @@ const studentAuthSlice = createSlice({
                     localStorage.removeItem(STUDENT_STORAGE_KEYS.USER_DATA);
                 }
             }
+        },
+        setStudentAccessToken: (state, action: PayloadAction<string>) => {
+            state.accessToken = action.payload;
+        },
+        setStudentRefreshToken: (state, action: PayloadAction<string>) => {
+            state.refreshToken = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -266,22 +273,9 @@ const studentAuthSlice = createSlice({
                 state.isAuthenticated = false;
             });
 
-        // Get Profile
-        builder
-            .addCase(getStudentProfile.pending, (state) => {
-                state.isLoading = true;
-            })
-            .addCase(getStudentProfile.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.user = action.payload;
-                state.error = null;
-            })
-            .addCase(getStudentProfile.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.payload as string;
-            });
+
     },
 });
 
-export const { clearStudentError, setStudentUser, clearStudentAuth, initializeStudentAuth } = studentAuthSlice.actions;
+export const { clearStudentError, setStudentUser, clearStudentAuth, initializeStudentAuth, setStudentAccessToken, setStudentRefreshToken } = studentAuthSlice.actions;
 export default studentAuthSlice.reducer;

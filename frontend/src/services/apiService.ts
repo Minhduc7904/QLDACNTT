@@ -1,10 +1,15 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { STORAGE_KEYS, HTTP_STATUS } from '../constants';
+import { STORAGE_KEYS, HTTP_STATUS, API_ENDPOINTS } from '../constants';
 
 class ApiService {
   private api: AxiosInstance;
   private baseURL: string;
   private isDevelopment: boolean;
+  private isRefreshing: boolean = false;
+  private failedQueue: Array<{
+    resolve: (value: any) => void;
+    reject: (error: any) => void;
+  }> = [];
 
   constructor() {
     this.isDevelopment = process.env.NODE_ENV === 'development';
@@ -101,17 +106,69 @@ class ApiService {
         this.logResponse(response);
         return response;
       },
-      (error) => {
+      async (error) => {
         // Log response error in development
         this.logError(error);
 
-        if (error.response?.status === HTTP_STATUS.UNAUTHORIZED) {
-          // Token expired or invalid
-          localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-          localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-          localStorage.removeItem(STORAGE_KEYS.USER_DATA);
-          window.location.href = '/login';
+        const originalRequest = error.config;
+
+        if (error.response?.status === HTTP_STATUS.UNAUTHORIZED && !originalRequest._retry) {
+          // Đánh dấu request đã retry để tránh infinite loop
+          originalRequest._retry = true;
+
+          if (this.isRefreshing) {
+            // Nếu đang refresh, queue request này
+            return new Promise((resolve, reject) => {
+              this.failedQueue.push({ resolve, reject });
+            }).then((token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              return this.api(originalRequest);
+            }).catch((err) => {
+              return Promise.reject(err);
+            });
+          }
+
+          this.isRefreshing = true;
+
+          try {
+            const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+
+            if (!refreshToken) {
+              throw new Error('No refresh token available');
+            }
+
+            // Gọi API refresh token
+            const refreshResponse = await this.refreshAccessToken(refreshToken);
+
+            if (refreshResponse?.data?.accessToken) {
+              const newAccessToken = refreshResponse.data.accessToken;
+              const newRefreshToken = refreshResponse.data.refreshToken;
+
+              // Lưu tokens mới
+              localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newAccessToken);
+              localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken);
+
+              // Retry tất cả requests trong queue
+              this.processQueue(null, newAccessToken);
+
+              // Retry original request với token mới
+              originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+              return this.api(originalRequest);
+            } else {
+              throw new Error('Invalid refresh response');
+            }
+
+          } catch (refreshError) {
+            // Refresh token thất bại, clear tất cả và redirect
+            this.processQueue(refreshError, null);
+            this.clearAuthData();
+            window.location.href = '/login';
+            return Promise.reject(refreshError);
+          } finally {
+            this.isRefreshing = false;
+          }
         }
+
         return Promise.reject(error);
       }
     );
@@ -183,6 +240,50 @@ class ApiService {
   // Get current logging status
   isLoggingEnabled(): boolean {
     return this.isDevelopment;
+  }
+
+  // Refresh access token using refresh token
+  private async refreshAccessToken(refreshToken: string): Promise<any> {
+    try {
+      // Gọi API refresh token trực tiếp không qua interceptor để tránh loop
+      const axiosInstance = axios.create({
+        baseURL: this.baseURL,
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await axiosInstance.post(API_ENDPOINTS.AUTH.COMMON.REFRESH, {
+        refreshToken: refreshToken
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Refresh token failed:', error);
+      throw error;
+    }
+  }
+
+  // Process queued requests after token refresh
+  private processQueue(error: any, token: string | null): void {
+    this.failedQueue.forEach(({ resolve, reject }) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(token);
+      }
+    });
+
+    this.failedQueue = [];
+  }
+
+  // Clear all authentication data
+  private clearAuthData(): void {
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.STUDENT_USER_DATA);
+    localStorage.removeItem(STORAGE_KEYS.ADMIN_USER_DATA);
   }
 }
 

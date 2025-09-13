@@ -2,6 +2,7 @@
 import { User } from '../../domain/entities/user/user.entity'
 import { Admin } from '../../domain/entities/user/admin.entity'
 import { Student } from '../../domain/entities/user/student.entity'
+import { Image } from '../../domain/entities/image/image.entity'
 import { StudentMapper } from './student.mapper'
 import { AdminMapper } from './admin.mapper'
 
@@ -15,20 +16,37 @@ export class UserMapper {
   static toDomainUser(prismaUser: any): User | null {
     if (!prismaUser) return null
 
+    // Map avatar if exists
+    let avatar: Image | undefined
+    if (prismaUser.avatar) {
+      avatar = new Image(
+        prismaUser.avatar.imageId,
+        prismaUser.avatar.adminId,
+        prismaUser.avatar.url,
+        prismaUser.avatar.anotherUrl,
+        prismaUser.avatar.mimeType,
+        prismaUser.avatar.storageProvider,
+        prismaUser.avatar.createdAt,
+        prismaUser.avatar.updatedAt,
+      )
+    }
+
     return new User(
-      prismaUser.userId,
-      prismaUser.username,
-      prismaUser.passwordHash,
-      prismaUser.firstName,
-      prismaUser.lastName,
-      prismaUser.isActive,
-      prismaUser.email ?? undefined,
-      prismaUser.createdAt,
-      prismaUser.isEmailVerified ?? false,
-      prismaUser.emailVerifiedAt ?? undefined,
-      prismaUser.lastLoginAt ?? undefined,
-      prismaUser.updatedAt ?? undefined,
-      prismaUser.oldUserId ?? undefined,
+      prismaUser.userId,                    // 1
+      prismaUser.username,                  // 2
+      prismaUser.passwordHash,              // 3
+      prismaUser.firstName,                 // 4
+      prismaUser.lastName,                  // 5
+      prismaUser.isActive,                  // 6
+      prismaUser.avatarId ?? undefined,     // 7 - avatarId
+      avatar,                               // 8 - avatar (now properly mapped)
+      prismaUser.email ?? undefined,        // 9 - email
+      prismaUser.createdAt,                 // 10 - createdAt
+      prismaUser.isEmailVerified ?? false,  // 11 - isEmailVerified
+      prismaUser.emailVerifiedAt ?? undefined, // 12 - emailVerifiedAt
+      prismaUser.lastLoginAt ?? undefined,     // 13 - lastLoginAt
+      prismaUser.updatedAt ?? undefined,       // 14 - updatedAt
+      prismaUser.oldUserId ?? undefined,       // 15 - oldUserId
     )
   }
 
