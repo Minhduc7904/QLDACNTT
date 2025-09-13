@@ -20,8 +20,8 @@ export const ROLE_NAMES = {
 export const ROLE_IDS = {
   SUPER_ADMIN: 1,
   ADMIN: 2,
-  TEACHER: 3,
-  STUDENT: 4,
+  TEACHER: 4,
+  STUDENT: 5,
   MODERATOR: 5,
   VIEWER: 6,
 } as const

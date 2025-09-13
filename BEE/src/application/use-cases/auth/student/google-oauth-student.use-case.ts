@@ -28,9 +28,9 @@ export class GoogleOAuthStudentUseCase {
   async execute(googleProfile: GoogleUserProfileDto): Promise<BaseResponseDto<LoginResponseDto>> {
     return await this.unitOfWork.executeInTransaction(async (repos) => {
       // 1. Kiểm tra user đã tồn tại chưa
-      // console.log(googleProfile);
+      console.log(googleProfile);
       let existingUser = await repos.userRepository.findByEmail(googleProfile.email)
-
+      console.log(existingUser);
       let user, student, studentId: number
 
       if (existingUser) {
@@ -67,14 +67,14 @@ export class GoogleOAuthStudentUseCase {
         const hashedPassword = await this.passwordService.hashPassword(randomPassword)
 
         let avatarId: number | undefined = undefined
-        // console.log(googleProfile.picture);
+        console.log(googleProfile.picture);
         if (googleProfile.picture) {
           const avatar = await repos.imageRepository.create({
             url: googleProfile.picture,
             storageProvider: 'GCS',
           })
           avatarId = avatar.imageId
-          console.log(avatarId);
+          console.log('avatarId', avatarId);
         }
 
         // Tạo user
@@ -90,8 +90,13 @@ export class GoogleOAuthStudentUseCase {
           emailVerifiedAt: new Date(),
         })
 
-        user = await repos.userRepository.findByUsernameWithDetails(createdUser.username)
+        console.log('createdUser', createdUser);
 
+        const userWithDetails = await repos.userRepository.findByUsernameWithDetails(createdUser.username)
+        if (!userWithDetails) {
+          throw new UnauthorizedException('Tài khoản này không phải tài khoản sinh viên. Vui lòng sử dụng đăng nhập cho admin.')
+        }
+        user = userWithDetails.user
         // Tạo student profile mặc định
         student = await repos.studentRepository.create({
           userId: user.userId,
@@ -103,9 +108,9 @@ export class GoogleOAuthStudentUseCase {
 
         studentId = student.studentId
 
-        await repos.roleRepository.assignRoleToUser(user.userId, ROLE_IDS.STUDENT)
+        const role = await repos.roleRepository.assignRoleToUser(user.userId, ROLE_IDS.STUDENT)
+        console.log('role', role);
       }
-
       // 2. Revoke tất cả refresh tokens cũ (single device login)
       await repos.userRefreshTokenRepository.revokeAllUserTokens(user.userId)
 
@@ -155,6 +160,7 @@ export class GoogleOAuthStudentUseCase {
         ipAddress: undefined,
         deviceFingerprint: undefined,
       })
+      console.log('Login successful', StudentResponseDto.fromUserWithStudent(user, student));
       return {
         success: true,
         message: 'Đăng nhập Google Student thành công',
