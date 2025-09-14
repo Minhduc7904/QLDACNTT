@@ -3,12 +3,11 @@ import { StudentAuthState, Student, LoginRequest, RegisterStudentRequest } from 
 import { authStudentService } from '../../services';
 import { STORAGE_KEYS } from '../../constants';
 import { createAuthThunkHandler, createAsyncThunkHandler } from '../../utils';
-
+import { Image } from '../../types';
 // Storage keys specific to student
 const STUDENT_STORAGE_KEYS = {
     ACCESS_TOKEN: STORAGE_KEYS.ACCESS_TOKEN,
     REFRESH_TOKEN: STORAGE_KEYS.REFRESH_TOKEN,
-    USER_DATA: STORAGE_KEYS.STUDENT_USER_DATA,
 };
 
 // Initial state
@@ -19,8 +18,7 @@ const initialState: StudentAuthState = {
     isLoading: false,
     error: null,
     isAuthenticated: (!!localStorage.getItem(STUDENT_STORAGE_KEYS.ACCESS_TOKEN) &&
-        !!localStorage.getItem(STUDENT_STORAGE_KEYS.REFRESH_TOKEN) &&
-        !!localStorage.getItem(STUDENT_STORAGE_KEYS.USER_DATA)
+        !!localStorage.getItem(STUDENT_STORAGE_KEYS.REFRESH_TOKEN)
     ),
 };
 
@@ -52,7 +50,6 @@ export const loginStudent = createAsyncThunk<
                 console.log(response);
                 localStorage.setItem(STUDENT_STORAGE_KEYS.ACCESS_TOKEN, response.data.tokens.accessToken);
                 localStorage.setItem(STUDENT_STORAGE_KEYS.REFRESH_TOKEN, response.data.tokens.refreshToken);
-                localStorage.setItem(STUDENT_STORAGE_KEYS.USER_DATA, JSON.stringify(response.data.user));
                 return response.data;
             }
         }
@@ -73,7 +70,6 @@ export const registerStudent = createAsyncThunk<
             onSuccess: (response) => {
                 localStorage.setItem(STUDENT_STORAGE_KEYS.ACCESS_TOKEN, response.data.token);
                 localStorage.setItem(STUDENT_STORAGE_KEYS.REFRESH_TOKEN, response.data.refreshToken);
-                localStorage.setItem(STUDENT_STORAGE_KEYS.USER_DATA, JSON.stringify(response.data.user));
                 return response.data;
             }
         }
@@ -90,7 +86,6 @@ export const logoutStudent = createAsyncThunk(
                 // Always clear localStorage, even if server logout fails
                 localStorage.removeItem(STUDENT_STORAGE_KEYS.ACCESS_TOKEN);
                 localStorage.removeItem(STUDENT_STORAGE_KEYS.REFRESH_TOKEN);
-                localStorage.removeItem(STUDENT_STORAGE_KEYS.USER_DATA);
             }
             return null;
         },
@@ -107,7 +102,6 @@ export const logoutStudentAllDevices = createAsyncThunk(
             } finally {
                 localStorage.removeItem(STUDENT_STORAGE_KEYS.ACCESS_TOKEN);
                 localStorage.removeItem(STUDENT_STORAGE_KEYS.REFRESH_TOKEN);
-                localStorage.removeItem(STUDENT_STORAGE_KEYS.USER_DATA);
             }
             return null;
         },
@@ -152,20 +146,16 @@ const studentAuthSlice = createSlice({
             state.error = null;
             localStorage.removeItem(STUDENT_STORAGE_KEYS.ACCESS_TOKEN);
             localStorage.removeItem(STUDENT_STORAGE_KEYS.REFRESH_TOKEN);
-            localStorage.removeItem(STUDENT_STORAGE_KEYS.USER_DATA);
         },
         initializeStudentAuth: (state) => {
             const accessToken = localStorage.getItem(STUDENT_STORAGE_KEYS.ACCESS_TOKEN);
             const refreshToken = localStorage.getItem(STUDENT_STORAGE_KEYS.REFRESH_TOKEN);
-            const userData = localStorage.getItem(STUDENT_STORAGE_KEYS.USER_DATA);
-            if (accessToken && userData) {
+            if (accessToken) {
                 try {
                     state.accessToken = accessToken;
-                    state.user = JSON.parse(userData);
                     state.isAuthenticated = true;
                 } catch (error) {
                     localStorage.removeItem(STUDENT_STORAGE_KEYS.ACCESS_TOKEN);
-                    localStorage.removeItem(STUDENT_STORAGE_KEYS.USER_DATA);
                 }
             }
         },
@@ -175,11 +165,19 @@ const studentAuthSlice = createSlice({
         setStudentRefreshToken: (state, action: PayloadAction<string>) => {
             state.refreshToken = action.payload;
         },
-        updateUserAvatar: (state, action: PayloadAction<string>) => {
-            if (state.user && state.user.imageUrls) {
-                state.user.imageUrls.url = action.payload;
+        updateUserAvatar: (state, action: PayloadAction<Image>) => {
+            if (state.user) {
+                if (state.user.imageUrls) {
+                    state.user.imageUrls.url = action.payload.url;
+                } else {
+                    state.user.imageUrls = {
+                        imageId: action.payload.imageId,
+                        url: action.payload.url
+                    };
+                }
             }
         }
+
     },
     extraReducers: (builder) => {
         // Login
@@ -277,8 +275,6 @@ const studentAuthSlice = createSlice({
                 state.accessToken = null;
                 state.isAuthenticated = false;
             });
-
-
     },
 });
 

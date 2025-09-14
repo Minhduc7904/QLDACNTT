@@ -56,9 +56,6 @@ const AuthCallbackPage: React.FC = () => {
                     if (profileResponse.success && profileResponse.data) {
                         const user = profileResponse.data;
 
-                        // Lưu user data vào localStorage
-                        localStorage.setItem(STORAGE_KEYS.STUDENT_USER_DATA, JSON.stringify(user));
-
                         // Cập nhật Redux state
                         setStudent(user);
 
@@ -73,11 +70,11 @@ const AuthCallbackPage: React.FC = () => {
                 } catch (profileError) {
                     console.error('Error fetching user profile:', profileError);
                     showError('Lỗi lấy thông tin người dùng: ' + (profileError as Error).message);
-                    
+
                     // Clear tokens nếu lỗi
                     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
                     localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-                    
+
                     navigate('/student/login', { replace: true });
                 }
             } else {

@@ -287,8 +287,6 @@ class ApiService {
   private clearAuthData(): void {
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.STUDENT_USER_DATA);
-    localStorage.removeItem(STORAGE_KEYS.ADMIN_USER_DATA);
   }
 }
 

@@ -1,8 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
 import { getStudentProfile, updateStudentProfile, clearStudentProfileError, setStudentProfile, clearStudentProfile, updateAvatar } from '../store/slices/studentSlice';
-import { Student } from '../types';
-
+import { Student, Image } from '../types';
 export const useStudent = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { profile, isLoading, isUpdating, error } = useSelector((state: RootState) => state.student);
@@ -27,7 +26,7 @@ export const useStudent = () => {
         return dispatch(updateStudentProfile({ id, data }));
     };
 
-    const updateProfileAvatar = (payload: string) => {
+    const updateProfileAvatar = (payload: Image) => {
         return dispatch(updateAvatar(payload));
     };
 

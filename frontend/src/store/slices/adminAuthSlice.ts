@@ -8,7 +8,6 @@ import { createAuthThunkHandler, createAsyncThunkHandler } from '../../utils';
 const ADMIN_STORAGE_KEYS = {
     ACCESS_TOKEN: STORAGE_KEYS.ACCESS_TOKEN,
     REFRESH_TOKEN: STORAGE_KEYS.REFRESH_TOKEN,
-    USER_DATA: STORAGE_KEYS.ADMIN_USER_DATA,
 };
 
 // Initial state
@@ -19,8 +18,7 @@ const initialState: AdminAuthState = {
     isLoading: false,
     error: null,
     isAuthenticated: (!!localStorage.getItem(ADMIN_STORAGE_KEYS.ACCESS_TOKEN) &&
-        !!localStorage.getItem(ADMIN_STORAGE_KEYS.REFRESH_TOKEN) &&
-        !!localStorage.getItem(ADMIN_STORAGE_KEYS.USER_DATA)
+        !!localStorage.getItem(ADMIN_STORAGE_KEYS.REFRESH_TOKEN)
     ),
 };
 
@@ -40,7 +38,6 @@ export const loginAdmin = createAsyncThunk<
                 console.log(response);
                 localStorage.setItem(ADMIN_STORAGE_KEYS.ACCESS_TOKEN, response.data.tokens.accessToken);
                 localStorage.setItem(ADMIN_STORAGE_KEYS.REFRESH_TOKEN, response.data.tokens.refreshToken);
-                localStorage.setItem(ADMIN_STORAGE_KEYS.USER_DATA, JSON.stringify(response.data.user));
                 return response.data;
             }
         }
@@ -61,7 +58,6 @@ export const registerAdmin = createAsyncThunk<
             onSuccess: (response) => {
                 localStorage.setItem(ADMIN_STORAGE_KEYS.ACCESS_TOKEN, response.data.token);
                 localStorage.setItem(ADMIN_STORAGE_KEYS.REFRESH_TOKEN, response.data.refreshToken);
-                localStorage.setItem(ADMIN_STORAGE_KEYS.USER_DATA, JSON.stringify(response.data.user));
                 return response.data;
             }
         }
@@ -78,7 +74,6 @@ export const logoutAdmin = createAsyncThunk(
                 // Always clear localStorage, even if server logout fails
                 localStorage.removeItem(ADMIN_STORAGE_KEYS.ACCESS_TOKEN);
                 localStorage.removeItem(ADMIN_STORAGE_KEYS.REFRESH_TOKEN);
-                localStorage.removeItem(ADMIN_STORAGE_KEYS.USER_DATA);
             }
             return null;
         },
@@ -95,7 +90,6 @@ export const logoutAdminAllDevices = createAsyncThunk(
             } finally {
                 localStorage.removeItem(ADMIN_STORAGE_KEYS.ACCESS_TOKEN);
                 localStorage.removeItem(ADMIN_STORAGE_KEYS.REFRESH_TOKEN);
-                localStorage.removeItem(ADMIN_STORAGE_KEYS.USER_DATA);
             }
             return null;
         },
@@ -127,7 +121,6 @@ export const getAdminProfile = createAsyncThunk<Admin>(
         {
             showSuccessNotification: false,
             onSuccess: (response) => {
-                localStorage.setItem(ADMIN_STORAGE_KEYS.USER_DATA, JSON.stringify(response.data));
                 return response.data;
             }
         }
@@ -153,21 +146,18 @@ const adminAuthSlice = createSlice({
             state.error = null;
             localStorage.removeItem(ADMIN_STORAGE_KEYS.ACCESS_TOKEN);
             localStorage.removeItem(ADMIN_STORAGE_KEYS.REFRESH_TOKEN);
-            localStorage.removeItem(ADMIN_STORAGE_KEYS.USER_DATA);
         },
         initializeAdminAuth: (state) => {
             const accessToken = localStorage.getItem(ADMIN_STORAGE_KEYS.ACCESS_TOKEN);
             const refreshToken = localStorage.getItem(ADMIN_STORAGE_KEYS.REFRESH_TOKEN);
-            const userData = localStorage.getItem(ADMIN_STORAGE_KEYS.USER_DATA);
 
-            if (accessToken && userData) {
+            if (accessToken) {
                 try {
                     state.accessToken = accessToken;
-                    state.user = JSON.parse(userData);
+                    state.refreshToken = refreshToken;
                     state.isAuthenticated = true;
                 } catch (error) {
                     localStorage.removeItem(ADMIN_STORAGE_KEYS.ACCESS_TOKEN);
-                    localStorage.removeItem(ADMIN_STORAGE_KEYS.USER_DATA);
                 }
             }
         },

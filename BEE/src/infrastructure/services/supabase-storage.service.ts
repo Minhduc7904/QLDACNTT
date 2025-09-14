@@ -36,7 +36,6 @@ export class SupabaseStorageService implements IStorageService {
             const fileName = options.fileName || this.generateFileName()
             const folder = options.folder || 'general'
             const filePath = `${folder}/${fileName}`
-            console.log('File path:', filePath, 'File name:', fileName, 'Folder:', folder, 'Bucket name:', this.bucketName)
             const { data, error } = await this.supabase.storage
                 .from(this.bucketName)
                 .upload(filePath, file, {

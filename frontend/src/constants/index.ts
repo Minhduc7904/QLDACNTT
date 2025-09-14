@@ -57,10 +57,6 @@ export const STORAGE_KEYS = {
     ACCESS_TOKEN: 'access_token',
     REFRESH_TOKEN: 'refresh_token',
 
-    STUDENT_USER_DATA: 'student_user_data',
-
-    ADMIN_USER_DATA: 'admin_user_data',
-
     // General keys
     THEME: 'theme',
     LANGUAGE: 'language',

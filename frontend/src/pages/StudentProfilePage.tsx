@@ -206,9 +206,13 @@ const StudentProfilePage: React.FC = () => {
 
 
                 if (response.success) {
+                    const image = {
+                       imageId: response.data.imageId,
+                        url: response.data.avatarUrl,
+                    }
                     showSuccess(t('avatarUpdated'), t('success'));
-                    updateProfileAvatar(response.data.avatarUrl);
-                    updateAvatarStudent(response.data.avatarUrl);
+                    updateProfileAvatar(image);
+                    updateAvatarStudent(image);
                 } else {
                     showError(response.message || t('avatarUpdateFailed'), t('error'));
                 }

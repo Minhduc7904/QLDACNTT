@@ -36,7 +36,6 @@ export class UserController {
   constructor(
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly updateUserAvatarUseCase: UpdateUserAvatarUseCase,
-    private readonly updateStudentUseCase: UpdateStudentUseCase,
     private readonly updateAdminUseCase: UpdateAdminUseCase,
   ) { }
 

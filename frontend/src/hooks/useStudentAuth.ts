@@ -12,7 +12,7 @@ import {
     updateUserAvatar
 } from '../store/slices/studentAuthSlice';
 import { LoginRequest, RegisterStudentRequest } from '../types';
-
+import { Image } from '../types';
 export const useStudentAuth = () => {
     const dispatch = useAppDispatch();
     const { user, accessToken, refreshToken, isLoading, error, isAuthenticated } = useAppSelector(
@@ -55,8 +55,8 @@ export const useStudentAuth = () => {
         dispatch(setStudentUser(user));
     };
 
-    const updateAvatarStudent = (avatar: string) => {
-        dispatch(updateUserAvatar(avatar));
+    const updateAvatarStudent = (image: Image) => {
+        dispatch(updateUserAvatar(image));
     };
 
     return {

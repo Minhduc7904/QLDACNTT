@@ -3,11 +3,7 @@ import { Student } from '../../types';
 import { studentService } from '../../services';
 import { STORAGE_KEYS } from '../../constants';
 import { createAuthThunkHandler } from '../../utils';
-
-// Storage keys specific to student
-const STUDENT_STORAGE_KEYS = {
-    USER_DATA: STORAGE_KEYS.STUDENT_USER_DATA,
-};
+import { Image } from '../../types';
 
 // Student state (separate from auth)
 interface StudentState {
@@ -34,7 +30,6 @@ export const getStudentProfile = createAsyncThunk<Student, string>(
         {
             showSuccessNotification: false,
             onSuccess: (response) => {
-                localStorage.setItem(STUDENT_STORAGE_KEYS.USER_DATA, JSON.stringify(response.data));
                 return response.data;
             }
         }
@@ -50,7 +45,6 @@ export const updateStudentProfile = createAsyncThunk<Student, { id: string; data
             showSuccessNotification: true,
             successMessage: 'Cập nhật thông tin thành công!',
             onSuccess: (response) => {
-                localStorage.setItem(STUDENT_STORAGE_KEYS.USER_DATA, JSON.stringify(response.data));
                 return response.data;
             }
         }
@@ -72,8 +66,17 @@ const studentSlice = createSlice({
             state.profile = null;
             state.error = null;
         },
-        updateAvatar: (state, action: PayloadAction<string>) => {
-            state.profile?.imageUrls && (state.profile.imageUrls.url = action.payload);
+        updateAvatar: (state, action: PayloadAction<Image>) => {
+            if (state.profile) {
+                if (state.profile.imageUrls) {
+                    state.profile.imageUrls.url = action.payload.url;
+                } else {
+                    state.profile.imageUrls = {
+                        imageId: action.payload.imageId,
+                        url: action.payload.url
+                    };
+                }
+            }
         }
     },
     extraReducers: (builder) => {

@@ -17,7 +17,7 @@ export class StudentService {
 
     async updateAvatar(
         file: File
-    ): Promise<ApiResponse<{ avatarUrl: string; oldAvatarUrl?: string }>> {
+    ): Promise<ApiResponse<{ imageId: number; avatarUrl: string; oldAvatarUrl?: string }>> {
         const formData = new FormData();
         formData.append('avatar', file);
 
